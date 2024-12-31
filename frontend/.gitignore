@@ -1,0 +1,9 @@
+node_modules
+
+#backend
+backend/go.sum
+backend/go.mod
+
+#database
+database/go.sum
+database/go.mod
