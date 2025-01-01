@@ -27,3 +27,6 @@ backend/go.sum
 #Database
 database/go.mod
 database/go.sum
+
+#Variables
+variables.env

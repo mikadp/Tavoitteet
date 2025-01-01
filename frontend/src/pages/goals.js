@@ -15,7 +15,7 @@ const Goals = () => {
 
     const fetchGoals = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/goals');
+            const response = await axios.get('http://localhost:8080/goals');
             setGoals(response.data);
         } catch (error) {
             console.error('Error fetching goals:', error);
@@ -24,7 +24,7 @@ const Goals = () => {
 
     const createGoal = async () => {
         try {
-            await axios.post('http://localhost:8000/goals', newGoal);
+            await axios.post("http://localhost:8080/goals", newGoal);
             setNewGoal({ goal_name: '', target_date: '', repetition: 'daily' });
             fetchGoals(); // fetch the updated list of goals
         } catch (error) {
@@ -34,7 +34,7 @@ const Goals = () => {
 
     const deleteGoal = async (goalId) => {
         try {
-            await axios.delete(`http://localhost:8000/goals/${goalId}`);
+            await axios.delete(`http://localhost:8080/goals/${goalId}`);
             fetchGoals(); // fetch the updated list of goals
         } catch (error) {
             console.error('Error deleting goal:', error);
@@ -48,7 +48,8 @@ const Goals = () => {
                 {goals.map(goal => (
                     <li key={goal.id} className="border p-2 mb-2 rounded flex justify-between">
                         {goal.goal_name} {goal.target_date} {goal.repetition}
-                        <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" onClick={() => deleteGoal(goal.id)}>Poista tavoite</button>
+                        <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" 
+                        onClick={() => deleteGoal(goal.id)}>Poista tavoite</button>
                     </li>
                 ))}
             </u1>

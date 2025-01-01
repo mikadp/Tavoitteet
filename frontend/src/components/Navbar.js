@@ -6,16 +6,16 @@ const Navbar = () => {
         <nav className="bg-white-600 text-white p-4">
             <ul className="flex space-x-4 justify-center">
                 <li>
-                    <Link to="/" className="hover:underline">Etusivu</Link>
+                    <Link to="/" className="text-black hover:text-gray-300 font-medium">Etusivu</Link>
                 </li>
                 <li>
-                    <Link to="/goals" className="hover:underline">Tavoitteet</Link>
+                    <Link to="/Goals" className="text-black hover:text-gray-300 font-medium">Tavoitteet</Link>
                 </li>
                 <li>
-                    <Link to="/users" className="hover:underline">Käyttäjät</Link>
+                    <Link to="/Users" className="text-black hover:text-gray-500 font-medium">Käyttäjät</Link>
                 </li>
                 <li>
-                    <Link to="/calendar" className="hover:underline">Kalenteri</Link>
+                    <Link to="/Calendar" className="text-black hover:text-gray-300 font-medium">Kalenteri</Link>
                 </li>
             </ul>
         </nav>

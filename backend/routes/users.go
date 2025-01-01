@@ -3,42 +3,48 @@ package routes
 import (
 	"backend/database"
 	"backend/models"
-	"encoding/json"
 	"net/http"
-	"strconv"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
 // Get all users
-func GetUsers(w http.ResponseWriter, r *http.Request) {
+func GetUsers(c *gin.Context) {
 	var users []models.User
 	database.DB.Find(&users)
-	json.NewEncoder(w).Encode(users)
+	c.JSON(http.StatusOK, gin.H{"data": users})
 }
 
 // Create a new user
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func CreateUser(c *gin.Context) {
 	var user models.User
-	json.NewDecoder(r.Body).Decode(&user)
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	database.DB.Create(&user)
-	json.NewEncoder(w).Encode(user)
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
-// update user active status
-func UpdateUserActiveStatus(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id, _ := strconv.Atoi(params["id"])
+// Update user active status
+func UpdateUserActiveStatus(c *gin.Context) {
+	id := c.Param("id")
 	var user models.User
-	database.DB.First(&user, id)
+	if err := database.DB.First(&user, id); err.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
+		return
+	}
 	user.Active = !user.Active
 	database.DB.Save(&user)
-	json.NewEncoder(w).Encode(user)
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id, _ := strconv.Atoi(params["id"])
-	database.DB.Delete(&models.User{}, id)
-	json.NewEncoder(w).Encode("User deleted")
+// Delete user
+func DeleteUser(c *gin.Context) {
+	id := c.Param("id")
+	if err := database.DB.Delete(&models.User{}, id); err.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
+		return
+	}
+	c.Status(http.StatusNoContent)
 }

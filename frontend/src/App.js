@@ -8,14 +8,19 @@ import Calendar from './pages/calendar.js';
 function App() {
   return (
     <Router>
-      <div className="gb-blue-500 text-black p-4">
+      <div className="min-h-screen bg-gray-100 flex flex-col">
           <Navbar />
-          <div className="container mx-auto p-4">
+          <div className="flex-grow flex items-center justify-center">
             <Routes>
-              <Route path="/" element={<div className="text-center"><h1 className="text-4xl font-bold mb-4">Tervetuloa!</h1><p className="text-lg">Valitse sivu ylhäältä.</p></div>} />
-              <Route path="/users" element={<Calendar />} />
-              <Route path="/goals" element={<Users />} />
-              <Route path="/" element={<Goals />} />
+              <Route path="/" 
+              element={
+                <div className="text-center">
+                  <h1 className="text-4xl font-bold mb-4">Tervetuloa!</h1>
+                  <p className="text-lg">Tämä on vain etusivu.</p>
+                </div>} />
+              <Route path="/goals" element={<Goals />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/calendar" element={<Calendar />} />
             </Routes>
           </div>
         </div>
