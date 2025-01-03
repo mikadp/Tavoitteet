@@ -35,7 +35,7 @@ func main() {
 	})
 
 	// API-reitit käyttäjille
-	users := r.Group("/api/users")
+	users := r.Group("/users")
 	{
 		users.GET("/", routes.GetUsers)
 		users.POST("/", routes.CreateUser)

@@ -9,7 +9,7 @@ CREATE TABLE goals (
     id SERIAL PRIMARY KEY,
     goal_name VARCHAR(100) NOT NULL,
     target_date DATE NOT NULL,
-    repetition VARCHAR(10) NOT NULL CHECK (repetition IN ('daily', 'weekly', 'monthly')),
+    repetition VARCHAR(10) NOT NULL CHECK (repetition IN ('daily', 'weekly', 'monthly'))
 );
 
 CREATE TABLE user_goals (

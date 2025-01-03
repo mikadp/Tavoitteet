@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from 'axios';
+import { fetchUsers, createUser, updateUserStatus, deleteUser } from "../api/api";
 
 const Users = () => {
     const [users, setUsers] = useState([]); // List of users, initially empty
@@ -7,13 +7,13 @@ const Users = () => {
     const [loading, setLoading] = useState(true); // For loading animation
 
     useEffect(() => {
-        fetchUsersFromDatabase();
+        loadUsers();
     }, []);
 
-const fetchUsersFromDatabase = async () => {
+const loadUsers = async () => {
         try {
             setLoading(true); //Starts the loading animation
-            const response = await axios.get('http://localhost:8080/users');
+            const response = await fetchUsers();
             setUsers(response.data);
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -21,33 +21,32 @@ const fetchUsersFromDatabase = async () => {
             setLoading(false); // Stops the loading animation
         }
 };
-const createUsers = async () => {
+const handleCreateUsers = async () => {
     if (!newUserName.trim()) {
         alert('Käyttäjän nimi ei voi olla tyhjä');
         return;
     }
     try {
-        await axios.post('http://localhost:8080/users', 
-        { name: newUserName });
+        await createUser({ name: newUserName }); 
         setNewUserName(''); // clear the input field
-        fetchUsersFromDatabase(); // fetch the updated list of users
+        loadUsers(); // fetch the updated list of users
     } catch (error) {
         console.error('Error creating user:', error);
     }
 };
 
-const setActiveUser = async (userId) => {
+const handleSetActiveUser = async (userId) => {
     try {
-        await axios.patch(`http://localhost:8080/users/${userId}`);
-        fetchUsersFromDatabase(); // fetch the updated list of users
+        await updateUserStatus(userId);
+        loadUsers(); // fetch the updated list of users
     } catch (error) {
         console.error('Error setting user active:', error);
     }
 };
-const deleteUser = async (userId) => {
+const handleDeleteUser = async (userId) => {
     try {
-        await axios.delete(`http://localhost:8080/users/${userId}`);
-        fetchUsersFromDatabase(); // fetch the updated list of users
+        await deleteUser(userId);
+        loadUsers(); // fetch the updated list of users
     } catch (error) {
         console.error('Error deleting user:', error);
     }
@@ -73,13 +72,13 @@ return (
                         {user.name} {user.is_active && <span className="text-green-600">(Aktiivinen)</span>}
                         <button
                             className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                            onClick={() => setActiveUser(user.id)}
+                            onClick={() => handleSetActiveUser(user.id)}
                         >
                             Aseta aktiiviseksi
                         </button>
                         <button
                             className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                            onClick={() => deleteUser(user.id)}
+                            onClick={() => handleDeleteUser(user.id)}
                         >
                             Poista käyttäjä
                         </button>
@@ -99,7 +98,7 @@ return (
                 />
                 <button 
                     className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" 
-                    onClick={createUsers}>Lisää käyttäjä
+                    onClick={handleCreateUsers}>Lisää käyttäjä
                 </button>
         </div>
     </div>
