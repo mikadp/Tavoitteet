@@ -34,20 +34,26 @@ func main() {
 		c.String(200, "Backend is running!")
 	})
 
-	// API-reitit käyttäjille
-	users := r.Group("/users")
+	//API-reitit
+	api := r.Group("/api")
 	{
-		users.GET("/", routes.GetUsers)
-		users.POST("/", routes.CreateUser)
-		users.PATCH("/:id", routes.UpdateUserActiveStatus)
-		users.DELETE("/:id", routes.DeleteUser)
-	}
 
-	// API-reitit tavoitteille
-	goals := r.Group("/api/goals")
-	{
-		goals.GET("/", routes.GetGoals)
-		goals.POST("/", routes.CreateGoal)
+		// API-reitit käyttäjille
+		users := api.Group("/users")
+		{
+			users.GET("/", routes.GetUsers)
+			users.POST("/", routes.CreateUser)
+			users.PATCH("/:id", routes.UpdateUserActiveStatus)
+			users.DELETE("/:id", routes.DeleteUser)
+		}
+
+		// API-reitit tavoitteille
+		goals := api.Group("/goals")
+		{
+			goals.GET("/", routes.GetGoals)
+			goals.POST("/", routes.CreateGoal)
+			goals.DELETE("/:id", routes.DeleteGoal)
+		}
 	}
 
 	// Käynnistä palvelin

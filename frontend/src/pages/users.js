@@ -21,7 +21,7 @@ const loadUsers = async () => {
             setLoading(false); // Stops the loading animation
         }
 };
-const handleCreateUsers = async () => {
+const handleCreateUser = async () => {
     if (!newUserName.trim()) {
         alert('Käyttäjän nimi ei voi olla tyhjä');
         return;
@@ -98,7 +98,7 @@ return (
                 />
                 <button 
                     className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" 
-                    onClick={handleCreateUsers}>Lisää käyttäjä
+                    onClick={handleCreateUser}>Lisää käyttäjä
                 </button>
         </div>
     </div>

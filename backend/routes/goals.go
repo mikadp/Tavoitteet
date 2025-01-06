@@ -4,10 +4,8 @@ import (
 	"backend/database"
 	"backend/models"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/mux"
 )
 
 // Get all goals
@@ -29,9 +27,11 @@ func CreateGoal(c *gin.Context) {
 }
 
 // Delete goal (optional)
-func DeleteGoal(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id, _ := strconv.Atoi(params["id"])
-	database.DB.Delete(&models.User{}, id)
-	w.WriteHeader(http.StatusNoContent)
+func DeleteGoal(c *gin.Context) {
+	params := c.Param("id")
+	if err := database.DB.Delete(&models.User{}, params); err.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": "Goal deleted successfully"})
 }
