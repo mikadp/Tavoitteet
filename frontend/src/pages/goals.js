@@ -17,12 +17,13 @@ const Goals = () => {
         setError(null); // clear the previous error
         try {
             const response = await fetchGoals();
-            setGoals(response.data);
+            const data = Array.isArray(response.data) ? response.data : [];
+            setGoals(data);
         } catch (error) {
             console.error('Error fetching goals:', error);
             setError('Tavoitteiden lataaminen epäonnistui');
-            } finally {
-                setLoading(false);
+        } finally {
+            setLoading(false);
         }
     };
 

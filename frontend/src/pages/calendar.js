@@ -1,21 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { fetchGoals } from '../api/api';
+
 
 const Calendar = () => {
     const [goals, setGoals] = useState({});
     const [completedGoals, setCompletedGoals] = useState({});
-        const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() +1, 0).getDate();
+    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() +1, 0).getDate();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
         
-        useEffect(() =>{
-            // Fetch goals and comletion status from database when component mounts
-            fetchGoalsFromDatabase();
+    useEffect(() =>{
+    // Fetch goals and comletion status from database when component mounts
+        loadGoals();
     }, []);
 
-    const fetchGoalsFromDatabase = async () => {
-        // Mock data fetch - Replace with actual API call
-        const mockGoals = { 1: 'Kävele 10000', 2: 'Ulkoile tunti'};
-        const mockCompletedGoals = { 1: true, 2: false};
-        setGoals(mockGoals);
-        setCompletedGoals(mockCompletedGoals);
+    const loadGoals = async () => {
+        setLoading(true);
+        setError(null); // clear the previous error
+        try {
+            const response = await fetchGoals();
+            const data = Array.isArray(response.data) ? response.data : [];
+            setGoals(data);
+        } catch (error) {
+            console.error('Error fetching goals:', error);
+            setError('Tavoitteiden lataaminen epäonnistui');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleGoalChange = (day, event) => {

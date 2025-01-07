@@ -14,7 +14,8 @@ const loadUsers = async () => {
         try {
             setLoading(true); //Starts the loading animation
             const response = await fetchUsers();
-            setUsers(response.data);
+            const data = Array.isArray(response.data) ? response.data : [];
+            setUsers(data);
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
