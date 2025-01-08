@@ -5,6 +5,7 @@ import (
 	"backend/models"
 	"backend/routes"
 	"log"
+	"path/filepath"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,10 @@ func main() {
 		AllowHeaders:     []string{"Content-Type"},                   // Sallitut HTTP-otsikot
 		AllowCredentials: true,                                       // Evästeiden sallinta
 	}))
+
+	// Palvele staattisia tiedostoja (frontend)
+	frontendPath := "./frontend/build"
+	r.Static("/static", filepath.Join(frontendPath, "static"))
 
 	// Perusreitti tarkistukseen
 	r.GET("/", func(c *gin.Context) {
@@ -55,6 +60,11 @@ func main() {
 			goals.DELETE("/:id", routes.DeleteGoal)
 		}
 	}
+
+	//Ohjaa kaikki reitit frontendille
+	r.NoRoute(func(c *gin.Context) {
+		c.File(filepath.Join(frontendPath, "index.html"))
+	})
 
 	// Käynnistä palvelin
 	log.Println("Starting backend server on port 8080...")
