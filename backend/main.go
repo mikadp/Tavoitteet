@@ -17,7 +17,10 @@ func main() {
 	database.Connect()
 
 	// Suorita migraatiot
-	database.DB.AutoMigrate(&models.User{})
+	err := database.DB.AutoMigrate(&models.User{}, &models.Goal{})
+	if err != nil {
+		log.Fatalf("Migration failed: %v", err)
+	}
 
 	// Luo Gin-palvelin
 	r := gin.Default()
@@ -68,7 +71,7 @@ func main() {
 
 	// Käynnistä palvelin
 	log.Println("Starting backend server on port 8080...")
-	err := r.Run(":8080") // Käynnistä Gin-palvelin portissa 8080
+	err = r.Run(":8080") // Käynnistä Gin-palvelin portissa 8080
 	if err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}

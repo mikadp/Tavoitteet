@@ -4,13 +4,15 @@ import (
 	"time"
 )
 
-type User struct {
+type Goal struct {
 	ID         uint      `gorm:"primaryKey"`
-	User       string    `gorm:"not null"`
+	UserID     string    `gorm:"not null"` //Foreign key to user
 	GoalName   string    `gorm:"not null"`
 	TargetDate time.Time `gorm:"not null"`
 	Achieved   bool      `gorm:"default:false"`
 	Active     bool      `gorm:"default:true"`
 	Repetition string    `json:"repetition"` // e.g., "daily", "weekly", "monthly"
 	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	User       User `gorm:"foreignKey:UserID"` //Relationship to user
 }
