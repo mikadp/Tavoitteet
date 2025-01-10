@@ -1,0 +1,11 @@
+{
+  "files": {
+    "main.js": "./static/js/main.57453623.js",
+    "index.html": "./index.html",
+    "static/media/index.tailwindcss": "./static/media/index.d8c0cf0ba1a2b0de8020.tailwindcss",
+    "main.57453623.js.map": "./static/js/main.57453623.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.57453623.js"
+  ]
+}
