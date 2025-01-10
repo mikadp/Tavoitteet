@@ -10,14 +10,14 @@ import (
 
 // Get all goals
 func GetGoals(c *gin.Context) {
-	var goals []models.User
+	var goals []models.Goal
 	database.DB.Find(&goals)
 	c.JSON(http.StatusOK, gin.H{"data": goals})
 }
 
 // Create a new goal
 func CreateGoal(c *gin.Context) {
-	var goal models.User
+	var goal models.Goal
 	if err := c.ShouldBindJSON(&goal); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -29,7 +29,7 @@ func CreateGoal(c *gin.Context) {
 // Delete goal (optional)
 func DeleteGoal(c *gin.Context) {
 	params := c.Param("id")
-	if err := database.DB.Delete(&models.User{}, params); err.Error != nil {
+	if err := database.DB.Delete(&models.Goal{}, params); err.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
 		return
 	}
