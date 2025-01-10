@@ -36,6 +36,9 @@ func main() {
 	// Palvele staattisia tiedostoja (frontend)
 	frontendPath := "./frontend/build"
 	r.Static("/static", filepath.Join(frontendPath, "static"))
+	r.NoRoute(func(c *gin.Context) {
+		c.File(filepath.Join(frontendPath, "index.html"))
+	})
 
 	// Perusreitti tarkistukseen
 	r.GET("/", func(c *gin.Context) {
