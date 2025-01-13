@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Luo axios instanssi perus-URL:llä
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api', //backendin perus-URL kaikki api-kutsut alkavat tällä
+    baseURL: process.env.REACT_APP_API_URL , //backendin perus-URL kaikki api-kutsut alkavat tällä
 });
 
 // Käyttäjä-API 

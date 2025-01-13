@@ -14,8 +14,8 @@ const loadUsers = async () => {
         try {
             setLoading(true); //Starts the loading animation
             const response = await fetchUsers();
-            const data = Array.isArray(response.data) ? response.data : [];
-            setUsers(data);
+            // Proper logging mechanism can be added here if needed
+            setUsers(Array.isArray(response.data) ? response.data : []); // Ensure the data is an array
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
@@ -54,32 +54,34 @@ const handleDeleteUser = async (userId) => {
 };
 
 
+const noUsers = users.length === 0;
+
 return (
     <div>
         <h1 className="text-2xl font-bold mb-4">Käyttäjähallinta</h1>
         {/*show loading animation while fetching data */}
         {loading ? (
             <p>Ladataan...</p>
-        ) : users.length === 0 ?(
+        ) : noUsers ? (
             <p>Ei käyttäjiä</p>
         ) : (
-            // Show the list of users
-            <ul className="mb-4">
-                {users.map((user) => (
+        // Show the list of users
+        <ul className="mb-4">
+            {users.map((user) => (
                     <li
-                        key={user.id}
+                        key={users.id}
                         className="border p-2 mb-2 rounded flex justify-between"
                     >
-                        {user.name} {user.is_active && <span className="text-green-600">(Aktiivinen)</span>}
+                        {users.name} {users.isActive && <span className="text-green-600">(Aktiivinen)</span>}
                         <button
                             className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                            onClick={() => handleSetActiveUser(user.id)}
+                            onClick={() => handleSetActiveUser(users.id)}
                         >
                             Aseta aktiiviseksi
                         </button>
                         <button
                             className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                            onClick={() => handleDeleteUser(user.id)}
+                            onClick={() => handleDeleteUser(users.id)}
                         >
                             Poista käyttäjä
                         </button>

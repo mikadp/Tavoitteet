@@ -77,6 +77,8 @@ const Goals = () => {
                 <ErrorMessage error={error} />
                 {loading ? (
                     <p>Ladataan...</p>
+                ) : goals.length === 0 ? (
+                    <p>Ei tavoitteita</p>
                 ): (
                     <ul className="mb-4">
                         {goals.map((goal) => (

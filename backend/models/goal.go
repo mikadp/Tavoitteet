@@ -10,7 +10,6 @@ type Goal struct {
 	GoalName   string    `gorm:"not null"`
 	TargetDate time.Time `gorm:"not null"`
 	Achieved   bool      `gorm:"default:false"`
-	Active     bool      `gorm:"default:true"`
 	Repetition string    `json:"repetition"` // e.g., "daily", "weekly", "monthly"
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
