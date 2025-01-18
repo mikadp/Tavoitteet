@@ -69,19 +69,19 @@ return (
         <ul className="mb-4">
             {users.map((user) => (
                     <li
-                        key={users.id}
+                        key={user.id}
                         className="border p-2 mb-2 rounded flex justify-between"
                     >
-                        {users.name} {users.isActive && <span className="text-green-600">(Aktiivinen)</span>}
+                        {user.name} {user.isActive && <span className="text-green-600">(Aktiivinen)</span>}
                         <button
                             className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                            onClick={() => handleSetActiveUser(users.id)}
+                            onClick={() => handleSetActiveUser(user.id)}
                         >
                             Aseta aktiiviseksi
                         </button>
                         <button
                             className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                            onClick={() => handleDeleteUser(users.id)}
+                            onClick={() => handleDeleteUser(user.id)}
                         >
                             Poista käyttäjä
                         </button>

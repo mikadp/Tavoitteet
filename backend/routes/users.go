@@ -18,12 +18,19 @@ func GetUsers(c *gin.Context) {
 // Create a new user
 func CreateUser(c *gin.Context) {
 	var user models.User
+	// Validate the input
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	// Validate that name is not empty
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	// Create user
 	database.DB.Create(&user)
-	c.JSON(http.StatusOK, gin.H{"data": user})
+	c.JSON(http.StatusCreated, gin.H{"data": user})
 }
 
 // Update user active status

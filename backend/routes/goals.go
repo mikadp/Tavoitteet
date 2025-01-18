@@ -19,7 +19,7 @@ func GetGoals(c *gin.Context) {
 func CreateGoal(c *gin.Context) {
 	var goal models.Goal
 	if err := c.ShouldBindJSON(&goal); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON data"})
 		return
 	}
 	database.DB.Create(&goal)
