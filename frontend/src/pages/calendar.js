@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchGoals } from '../api/api';
+import { fetchActiveUserGoals } from '../api/api';
 
 
 const Calendar = () => {
@@ -10,24 +10,25 @@ const Calendar = () => {
     const [error, setError] = useState(null);
         
     useEffect(() =>{
-    // Fetch goals and comletion status from database when component mounts
-        loadGoals();
-    }, []);
+    // Fetch active user goals and completion status from database when component mounts
+        const loadActiveUserGoals = async () => {
+            setLoading(true);
+            setError(null); // clear the previous error
+            try {
+                const response = await fetchActiveUserGoals();
+                console.log("Active user goals:", response.data); //Debug
+                const data = Array.isArray(response.data) ? response.data : [];
+                setGoals(data);
+            } catch (error) {
+                console.error('Error fetching goals:', error);
+                setError('Tavoitteiden lataaminen epäonnistui');
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadActiveUserGoals();
 
-    const loadGoals = async () => {
-        setLoading(true);
-        setError(null); // clear the previous error
-        try {
-            const response = await fetchGoals();
-            const data = Array.isArray(response.data) ? response.data : [];
-            setGoals(data);
-        } catch (error) {
-            console.error('Error fetching goals:', error);
-            setError('Tavoitteiden lataaminen epäonnistui');
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, []);
 
     const handleGoalChange = (day, event) => {
         const newGoals = {...goals, [day]: event.target.value};

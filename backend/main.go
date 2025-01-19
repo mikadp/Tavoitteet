@@ -63,6 +63,7 @@ func main() {
 		{
 			goals.GET("/", routes.GetGoals)
 			goals.POST("/", routes.CreateGoal)
+			goals.GET("/active", routes.GetActiveUserGoals)
 			goals.DELETE("/:id", routes.DeleteGoal)
 		}
 	}

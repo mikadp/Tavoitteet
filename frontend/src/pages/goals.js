@@ -35,8 +35,12 @@ const Goals = () => {
         
         setLoading(true);
         try {
-            const createdGoal = await createGoal(newGoal);
-            setGoals([...goals, createdGoal.data]); // update the state directly
+            const resoponse = await createGoal({
+                goal_name: newGoal.goal_name,
+                target_date: newGoal.target_date,
+                repetition: newGoal.repetition
+            });
+            setGoals([...goals, resoponse.data]); // update the state directly
             setNewGoal(initialGoalState); // clear the input field
         } catch (error) {
             console.error('Error creating goal:', error);
@@ -103,12 +107,6 @@ const Goals = () => {
                         type="date"
                         value={newGoal.target_date}
                         onChange={handleTargetDateChange}
-                        className="border p-2 rounded mr-2"
-                    />
-                    <input
-                        type="text"
-                        value={newGoal.goal_name}
-                        onChange={handleGoalNameChange}
                         className="border p-2 rounded mr-2"
                     />
                     <select

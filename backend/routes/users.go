@@ -37,12 +37,20 @@ func CreateUser(c *gin.Context) {
 func UpdateUserActiveStatus(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
+
+	// Check if the user exists
 	if err := database.DB.First(&user, id); err.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
 		return
 	}
-	user.Active = !user.Active
+
+	// Set all other users to inactive
+	database.DB.Model(&models.User{}).Update("Active", false)
+
+	// Set the user to active
+	user.Active = true
 	database.DB.Save(&user)
+
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 

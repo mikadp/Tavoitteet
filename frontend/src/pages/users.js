@@ -10,7 +10,7 @@ const Users = () => {
         loadUsers();
     }, []);
 
-const loadUsers = async () => {
+    const loadUsers = async () => {
         try {
             setLoading(true); //Starts the loading animation
             const response = await fetchUsers();
@@ -21,91 +21,92 @@ const loadUsers = async () => {
         } finally {
             setLoading(false); // Stops the loading animation
         }
-};
-const handleCreateUser = async () => {
-    if (!newUserName.trim()) {
-        alert('Käyttäjän nimi ei voi olla tyhjä');
-        return;
-    }
-    try {
-        await createUser({ name: newUserName }); 
-        setNewUserName(''); // clear the input field
-        loadUsers(); // fetch the updated list of users
-    } catch (error) {
-        console.error('Error creating user:', error);
-    }
-};
+    };
 
-const handleSetActiveUser = async (userId) => {
-    try {
-        await updateUserStatus(userId);
-        loadUsers(); // fetch the updated list of users
-    } catch (error) {
-        console.error('Error setting user active:', error);
-    }
-};
-const handleDeleteUser = async (userId) => {
-    try {
-        await deleteUser(userId);
-        loadUsers(); // fetch the updated list of users
-    } catch (error) {
-        console.error('Error deleting user:', error);
-    }
-};
+    const handleCreateUser = async () => {
+        if (!newUserName.trim()) {
+            alert('Käyttäjän nimi ei voi olla tyhjä');
+            return;
+        }
+        try {
+            await createUser({ name: newUserName }); 
+            setNewUserName(''); // clear the input field
+            loadUsers(); // fetch the updated list of users
+        } catch (error) {
+            console.error('Error creating user:', error);
+        }
+    };
 
+    const handleSetActiveUser = async (userId) => {
+        try {
+            await updateUserStatus(userId); // call the API to set the user active
+            loadUsers(); // fetch the updated list of users
+            alert('Käyttäjä asetettu aktiiviseksi');
+        } catch (error) {
+            console.error('Error setting user active:', error);
+        }
+    };
 
-const noUsers = users.length === 0;
+    const handleDeleteUser = async (userId) => {
+        try {
+            await deleteUser(userId);
+            loadUsers(); // fetch the updated list of users
+        } catch (error) {
+            console.error('Error deleting user:', error);
+        }
+    };
 
-return (
-    <div>
-        <h1 className="text-2xl font-bold mb-4">Käyttäjähallinta</h1>
-        {/*show loading animation while fetching data */}
-        {loading ? (
-            <p>Ladataan...</p>
-        ) : noUsers ? (
-            <p>Ei käyttäjiä</p>
-        ) : (
-        // Show the list of users
-        <ul className="mb-4">
-            {users.map((user) => (
-                    <li
-                        key={user.id}
-                        className="border p-2 mb-2 rounded flex justify-between"
-                    >
-                        {user.name} {user.isActive && <span className="text-green-600">(Aktiivinen)</span>}
-                        <button
-                            className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                            onClick={() => handleSetActiveUser(user.id)}
-                        >
-                            Aseta aktiiviseksi
-                        </button>
-                        <button
-                            className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                            onClick={() => handleDeleteUser(user.id)}
-                        >
-                            Poista käyttäjä
-                        </button>
-                        </li>
-                ))}
-                </ul>
-        )}
-        {/* Create a new user */}
+    const noUsers = users.length === 0;
+
+    return (
         <div>
-            <h2 className="text-xl font-bold mb-2">Luo uusi käyttäjä</h2>
-            <input
-                type="text"
-                placeholder="Käyttäjän nimi"
-                value={newUserName}
-                onChange={(event) => setNewUserName(event.target.value)}
-                className="border p-2 mb-2 rounded"
-                />
-                <button 
-                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" 
-                    onClick={handleCreateUser}>Lisää käyttäjä
-                </button>
+            <h1 className="text-2xl font-bold mb-4">Käyttäjähallinta</h1>
+            {/*show loading animation while fetching data */}
+            {loading ? (
+                <p>Ladataan...</p>
+            ) : noUsers ? (
+                <p>Ei käyttäjiä</p>
+            ) : (
+            // Show the list of users
+            <ul className="mb-4">
+                {users.map((user) => (
+                        <li
+                            key={user.id}
+                            className="border p-2 mb-2 rounded flex justify-between"
+                        >
+                            {user.name} {user.isActive && <span className="text-green-600">(Aktiivinen)</span>}
+                            <button
+                                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                                onClick={() => handleSetActiveUser(user.id)}
+                            >
+                                Aseta aktiiviseksi
+                            </button>
+                            <button
+                                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                                onClick={() => handleDeleteUser(user.id)}
+                            >
+                                Poista käyttäjä
+                            </button>
+                            </li>
+                    ))}
+                    </ul>
+            )}
+            {/* Create a new user */}
+            <div>
+                <h2 className="text-xl font-bold mb-2">Luo uusi käyttäjä</h2>
+                <input
+                    type="text"
+                    placeholder="Käyttäjän nimi"
+                    value={newUserName}
+                    onChange={(event) => setNewUserName(event.target.value)}
+                    className="border p-2 mb-2 rounded"
+                    />
+                    <button 
+                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" 
+                        onClick={handleCreateUser}>Lisää käyttäjä
+                    </button>
+            </div>
         </div>
-    </div>
-       
     );
 };
 
