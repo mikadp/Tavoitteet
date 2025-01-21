@@ -5,23 +5,31 @@ const Users = () => {
     const [users, setUsers] = useState([]); // List of users, initially empty
     const [newUserName, setNewUserName] = useState('');
     const [loading, setLoading] = useState(true); // For loading animation
+    const [error, setError] = useState(''); // For error messages
 
     useEffect(() => {
-        loadUsers();
-    }, []);
+        console.log("Users state updated:", users); // check the users state
+    }, [users]); // Hook to log the users state allways when it changes
 
     const loadUsers = async () => {
         try {
             setLoading(true); //Starts the loading animation
+            console.log('Loading users...');
             const response = await fetchUsers();
-            // Proper logging mechanism can be added here if needed
-            setUsers(Array.isArray(response.data) ? response.data : []); // Ensure the data is an array
+            console.log('Loaded users from api:', response.data); // Check the response data
+            setUsers(Array.isArray(response.data.data) ? response.data.data : []); // Ensure the data is an array
+            console.log('Users:', users); // Check the users state
         } catch (error) {
+            setError('Käyttäjien lataaminen epäonnistui'); // Show an error message
             console.error('Error fetching users:', error);
         } finally {
             setLoading(false); // Stops the loading animation
         }
     };
+
+    useEffect(() => {
+        loadUsers(); // Fetch the users when the component is first rendered
+    }, []);
 
     const handleCreateUser = async () => {
         if (!newUserName.trim()) {
@@ -37,9 +45,9 @@ const Users = () => {
         }
     };
 
-    const handleSetActiveUser = async (userId) => {
+    const handleSetActiveUser = async (ID) => {
         try {
-            await updateUserStatus(userId); // call the API to set the user active
+            await updateUserStatus(ID); // call the API to set the user active
             loadUsers(); // fetch the updated list of users
             alert('Käyttäjä asetettu aktiiviseksi');
         } catch (error) {
@@ -47,9 +55,9 @@ const Users = () => {
         }
     };
 
-    const handleDeleteUser = async (userId) => {
+    const handleDeleteUser = async (ID) => {
         try {
-            await deleteUser(userId);
+            await deleteUser(ID);
             loadUsers(); // fetch the updated list of users
         } catch (error) {
             console.error('Error deleting user:', error);
@@ -63,7 +71,10 @@ const Users = () => {
             <h1 className="text-2xl font-bold mb-4">Käyttäjähallinta</h1>
             {/*show loading animation while fetching data */}
             {loading ? (
+                <div className="flex items-center justify-center">
+                <div className="spinner border-t-4 border-blue-500 w-8 h-8 rounded-full animate-spin"></div>
                 <p>Ladataan...</p>
+                </div>
             ) : noUsers ? (
                 <p>Ei käyttäjiä</p>
             ) : (
@@ -71,19 +82,19 @@ const Users = () => {
             <ul className="mb-4">
                 {users.map((user) => (
                         <li
-                            key={user.id}
+                            key={user.ID}
                             className="border p-2 mb-2 rounded flex justify-between"
                         >
-                            {user.name} {user.isActive && <span className="text-green-600">(Aktiivinen)</span>}
+                            {user.Name} {user.Active && <span className="text-green-600">(Aktiivinen)</span>}
                             <button
                                 className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                                onClick={() => handleSetActiveUser(user.id)}
+                                onClick={() => handleSetActiveUser(user.ID)}
                             >
                                 Aseta aktiiviseksi
                             </button>
                             <button
                                 className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                                onClick={() => handleDeleteUser(user.id)}
+                                onClick={() => handleDeleteUser(user.ID)}
                             >
                                 Poista käyttäjä
                             </button>
