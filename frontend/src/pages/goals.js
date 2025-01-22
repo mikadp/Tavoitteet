@@ -9,23 +9,26 @@ const Goals = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        loadGoals();
-    }, []);
+        console.log("Goals state updated:", goals);
+    }, [goals]);
 
     const loadGoals = async () => {
-        setLoading(true);
-        setError(null); // clear the previous error
         try {
+            setLoading(true);
+            console.log('Loading goals...');
             const response = await fetchGoals();
-            const data = Array.isArray(response.data) ? response.data : [];
-            setGoals(data);
+            setGoals(Array.isArray(response.data.data) ? response.data.data : []);
         } catch (error) {
-            console.error('Error fetching goals:', error);
             setError('Tavoitteiden lataaminen epäonnistui');
+            console.error('Error fetching goals:', error);
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        loadGoals();
+    },[]);
 
     const handleCreateGoal = async () => {
         if (!newGoal.goal_name.trim() || !newGoal.target_date.trim()) {
@@ -36,9 +39,9 @@ const Goals = () => {
         setLoading(true);
         try {
             const resoponse = await createGoal({
-                goal_name: newGoal.goal_name,
-                target_date: newGoal.target_date,
-                repetition: newGoal.repetition
+                GoalName: newGoal.goal_name,
+                TargetDate: newGoal.target_date,
+                Repetition: newGoal.repetition
             });
             setGoals([...goals, resoponse.data]); // update the state directly
             setNewGoal(initialGoalState); // clear the input field
