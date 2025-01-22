@@ -8,8 +8,8 @@ const api = axios.create({
 // Käyttäjä-API 
 export const fetchUsers = () => api.get("/users/");                // Hakee kaikki käyttäjät
 export const createUser = (data) => api.post("/users/", data);     // Luo uuden käyttäjän
-export const updateUserStatus = (id) => api.patch("/users/${id}"); // Päivittää käyttäjän tilan
-export const deleteUser = (id) => api.delete("/users/${id}");      // Poistaa käyttäjän
+export const updateUserStatus = (id) => api.patch(`/users/${id}`); // Päivittää käyttäjän tilan
+export const deleteUser = (id) => api.delete(`/users/${id}`);      // Poistaa käyttäjän
     
 // Tavoitteet-API
 export const fetchGoals = () => api.get("/goals/");                // Hakee kaikki tavoitteet
