@@ -2,10 +2,10 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    IsActive BOOLEAN DEFAULT FALSE
+    is_active BOOLEAN DEFAULT FALSE
     );
     
-CREATE UNIQUE INDEX unique_active_user ON users (id) WHERE IsActive = FALSE;
+CREATE UNIQUE INDEX unique_active_user ON users (id) WHERE is_active = FALSE;
 
 CREATE TABLE goals (
     id SERIAL PRIMARY KEY,
