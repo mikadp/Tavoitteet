@@ -3,6 +3,7 @@ package routes
 import (
 	"backend/database"
 	"backend/models"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,50 +18,64 @@ func GetGoals(c *gin.Context) {
 
 // Get goals by active user
 func GetActiveUserGoals(c *gin.Context) {
-	var active models.User
+	var IsActive models.User
 
 	// Find active user
-	if err := database.DB.Where("active = ?", true).First(&active); err.Error != nil {
+	if err := database.DB.Where("is_active = ?", true).First(&IsActive); err.Error != nil {
 		c.JSON(http.StatusOK, gin.H{"data": []models.Goal{}})
 		return
 	}
 
 	var goals []models.Goal
-	database.DB.Where("user_id = ?", active.ID).Find(&goals)
+	database.DB.Where("user_id = ?", IsActive.ID).Find(&goals)
 	c.JSON(http.StatusOK, gin.H{"data": goals})
 }
 
 // Create a new goal
 func CreateGoal(c *gin.Context) {
 	var goal models.Goal
+	var IsActive models.User
 
 	// Find active user
-	var active models.User
-	if err := database.DB.Where("active = ?", true).First(&active); err.Error != nil {
+	if err := database.DB.Where("is_active = ?", true).First(&IsActive).Error; err != nil {
+		log.Println("Active user not found", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Active user not found"})
 		return
 	}
+	log.Println("Active user found", IsActive)
 
+	// Validate input
 	if err := c.ShouldBindJSON(&goal); err != nil {
+		log.Println("Invalid JSON data", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON data"})
 		return
 	}
+	log.Println("Goal data", goal)
 
-	if goal.GoalName == "" || goal.TargetDate.IsZero() || goal.Repetition == "" {
+	// Validate required fields
+	if goal.GoalName == "" || goal.TargetDate == "" || goal.Repetition == "" {
+		log.Println("Missing required fields", goal)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields"})
 		return
 	}
+	// set default values
+	goal.UserID = IsActive.ID
+	if goal.Description == "" {
+		goal.Description = "Ei kuvausta"
+	}
+
+	log.Println("Goal data before save:", goal)
 
 	// Set the user_id field to the active user's ID
-	goal.UserID = active.ID
-	database.DB.Create(&goal)
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Goal created successfully",
-		"data": gin.H{
-			"goal": goal,
-			"user": active.Name,
-		},
-	})
+	goal.UserID = IsActive.ID
+	if err := database.DB.Create(&goal).Error; err != nil {
+		log.Println("Failed to create goal:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create goal"})
+		return
+	}
+
+	log.Println("Goal created successfully", goal)
+	c.JSON(http.StatusOK, gin.H{"data": goal})
 }
 
 // Delete goal (optional)

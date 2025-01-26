@@ -14,7 +14,7 @@ export const deleteUser = (id) => api.delete(`/users/${id}`);      // Poistaa k�
 // Tavoitteet-API
 export const fetchGoals = () => api.get("/goals/");                // Hakee kaikki tavoitteet
 export const createGoal = (data) => api.post("/goals/", data);     // Luo uuden tavoitteen
-export const deleteGoal = (id) => api.delete("/goals/${id}");      // Poistaa tavoitteen
+export const deleteGoal = (id) => api.delete(`/goals/${id}`);      // Poistaa tavoitteen
 export const fetchActiveUserGoals = () => api.get("/goals/active"); // Hakee aktiivisen käyttäjän tavoitteet
 
 

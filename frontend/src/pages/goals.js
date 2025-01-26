@@ -7,6 +7,38 @@ const Goals = () => {
     const [newGoal, setNewGoal] = useState(initialGoalState);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+
+    // Format functions
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('fi-FI',{
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+        };
+    const formatRepetition = (repetition) => {
+        switch (repetition) {
+            case 'daily':
+                return 'Päivittäinen';
+            case 'weekly':
+                return 'Viikottainen';
+            case 'monthly':
+                return 'Kuukausittainen';
+            default:
+                return repetition;
+        }
+    };
+
+    //success message
+    const SuccessMessage = ({ success }) => {
+        return success ? <p className="text-green-500 mb-4">{success}</p> : null;
+    };
+    //error message
+    const ErrorMessage = ({ error }) => {
+        return error ? <p className="text-red-500 mb-4">{error}</p> : null;
+    };
 
     useEffect(() => {
         console.log("Goals state updated:", goals);
@@ -38,13 +70,19 @@ const Goals = () => {
         
         setLoading(true);
         try {
+            console.log('Sending goal data:', {
+                goal_name: newGoal.goal_name,
+                target_date: newGoal.target_date,
+                repetition: newGoal.repetition,
+            });
             const resoponse = await createGoal({
-                GoalName: newGoal.goal_name,
-                TargetDate: newGoal.target_date,
-                Repetition: newGoal.repetition
+                goal_name: newGoal.goal_name,
+                target_date: newGoal.target_date,
+                repetition: newGoal.repetition
             });
             setGoals([...goals, resoponse.data]); // update the state directly
             setNewGoal(initialGoalState); // clear the input field
+            setSuccess('Tavoite luotu onnistuneesti'); // Show a success message
         } catch (error) {
             console.error('Error creating goal:', error);
             setError('Tavoitteen luominen epäonnistui');
@@ -81,21 +119,43 @@ const Goals = () => {
     return (
             <div className="p-4">
                 <h1 className="text-2xl font-bold mb-4">Tavoitteet</h1>
+                {/*Show error and success messages*/}
                 <ErrorMessage error={error} />
+                <SuccessMessage success={success} />
+
                 {loading ? (
                     <p>Ladataan...</p>
                 ) : goals.length === 0 ? (
                     <p>Ei tavoitteita</p>
                 ): (
-                    <ul className="mb-4">
-                        {goals.map((goal) => (
-                            <li key={goal.id} className="border p-2 mb-2 rounded flex justify-between">
-                                {goal.goal_name} {goal.target_date} {goal.repetition}
-                                <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" 
-                                onClick={() => handleDeleteGoal(goal.id)}>Poista tavoite</button>
-                            </li>
+                    <div className="overflow-x-auto">
+                        <table className="table-auto border-collapse border-gray-300 w-full">
+                            <thead>
+                                <tr className="bg-gray-200">
+                                    <th className="border border-gray-300 px-4 py-2 text-left">Nimi</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left">Tavoite päivämäärä</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left">Toistuvuus</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left">Poista tavoite</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        {goals.map((goal, index) => (
+                            <tr key={goal.id} className={`hover:bg-gray-50 ${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}>
+                                <td className="border border-gray-300 px-4 py-2">{goal.goal_name}</td>
+                                <td className="border border-gray-300 px-4 py-2">{formatDate(goal.target_date)}</td>
+                                <td className="border border-gray-300 px-4 py-2">{formatRepetition(goal.repetition)}</td>
+                                <td className="border border-gray-300 px-4 py-2">
+                                    <button
+                                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 mr-2"
+                                        onClick={() => handleDeleteGoal(goal.id)}
+                                    >   Poista
+                                    </button>
+                                </td>
+                            </tr>
                         ))}
-                    </ul>
+                            </tbody>
+                        </table>       
+                    </div>
                 )}
                 <div>
                     <h2 className="text-lg font-bold mb-2">Luo uusi tavoite</h2>
@@ -130,9 +190,5 @@ const Goals = () => {
             </div>
         );
 };
-const ErrorMessage = ({ error }) => {
-    return error ? <p className="text-red-500 mb-4">{error}</p> : null;
-};
-
 
 export default Goals;
