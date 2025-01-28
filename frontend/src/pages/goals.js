@@ -11,13 +11,17 @@ const Goals = () => {
 
     // Format functions
     const formatDate = (dateString) => {
-        const date = new Date(dateString);
+        if (!dateString) return 'Päivämäärä puuttuu';
+       
+        const date = typeof dateString === "string" ? new Date(dateString + "T00:00:00Z") : new Date(dateString);
+
+        if (isNaN(date.getTime())) return 'Virheellinen päivämäärä';
         return date.toLocaleDateString('fi-FI',{
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
         });
-        };
+    };
     const formatRepetition = (repetition) => {
         switch (repetition) {
             case 'daily':
@@ -67,25 +71,33 @@ const Goals = () => {
             alert('Tavoitteen nimi ja päivämäärä eivät voi olla tyhjiä');
             return;
         }
-        
+
         setLoading(true);
+        setError(null);
+        setSuccess(null);
+
         try {
             console.log('Sending goal data:', {
                 goal_name: newGoal.goal_name,
                 target_date: newGoal.target_date,
                 repetition: newGoal.repetition,
             });
-            const resoponse = await createGoal({
+
+            const response = await createGoal({
                 goal_name: newGoal.goal_name,
                 target_date: newGoal.target_date,
                 repetition: newGoal.repetition
             });
-            setGoals([...goals, resoponse.data]); // update the state directly
+            if (response?.data) {
+            setGoals(prevGoals => [...prevGoals, response.data]); // update the state directly
             setNewGoal(initialGoalState); // clear the input field
-            setSuccess('Tavoite luotu onnistuneesti'); // Show a success message
+            setSuccess('✅Tavoite luotu onnistuneesti'); // Show a success message
+            } else {
+                throw new error('Invalid response');
+            }
         } catch (error) {
-            console.error('Error creating goal:', error);
-            setError('Tavoitteen luominen epäonnistui');
+            console.error('❌Error creating goal:', error.response?.data || error.message);
+            setError(error.response?.data?.error || 'Tavoitteen luominen epäonnistui');
         } finally {
             setLoading(false);
         }
@@ -97,8 +109,8 @@ const Goals = () => {
             await deleteGoal(goalId);
             setGoals(goals.filter(goal => goal.id !== goalId)); // update the state directly
         } catch (error) {
-            console.error('Error deleting goal:', error);
-            setError('Tavoitteen poistaminen epäonnistui');
+            console.error('❌Error deleting goal:', error);
+            setError('✅Tavoitteen poistaminen epäonnistui');
         } finally {
             setLoading(false);
         }

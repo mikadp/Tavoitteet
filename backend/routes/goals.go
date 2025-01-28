@@ -5,6 +5,7 @@ import (
 	"backend/models"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -52,8 +53,15 @@ func CreateGoal(c *gin.Context) {
 	}
 	log.Println("Goal data", goal)
 
+	// Validate date format
+	if _, err := time.Parse("2006-01-02", goal.TargetDate.Format("2006-01-02")); err != nil {
+		log.Println("Invalid date format", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format"})
+		return
+	}
+
 	// Validate required fields
-	if goal.GoalName == "" || goal.TargetDate == "" || goal.Repetition == "" {
+	if goal.GoalName == "" || goal.TargetDate.IsZero() || goal.Repetition == "" {
 		log.Println("Missing required fields", goal)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields"})
 		return
@@ -66,8 +74,7 @@ func CreateGoal(c *gin.Context) {
 
 	log.Println("Goal data before save:", goal)
 
-	// Set the user_id field to the active user's ID
-	goal.UserID = IsActive.ID
+	// save to database
 	if err := database.DB.Create(&goal).Error; err != nil {
 		log.Println("Failed to create goal:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create goal"})
@@ -75,7 +82,18 @@ func CreateGoal(c *gin.Context) {
 	}
 
 	log.Println("Goal created successfully", goal)
-	c.JSON(http.StatusOK, gin.H{"data": goal})
+
+	// Return the created goal
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"id":          goal.ID,
+			"goalName":    goal.GoalName,
+			"description": goal.Description,
+			"target_date": goal.TargetDate,
+			"repetition":  goal.Repetition,
+			"userID":      goal.UserID,
+		},
+	})
 }
 
 // Delete goal (optional)
