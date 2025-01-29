@@ -34,7 +34,13 @@ func GetActiveUserGoals(c *gin.Context) {
 
 // Create a new goal
 func CreateGoal(c *gin.Context) {
-	var goal models.Goal
+
+	var input struct {
+		GoalName   string `json:"goal_name"`
+		TargetDate string `json:"target_date"`
+		Repetition string `json:"repetition"`
+	}
+
 	var IsActive models.User
 
 	// Find active user
@@ -45,27 +51,30 @@ func CreateGoal(c *gin.Context) {
 	}
 	log.Println("Active user found", IsActive)
 
-	// Validate input
-	if err := c.ShouldBindJSON(&goal); err != nil {
+	// Bind JSON -> Input (string)
+	if err := c.ShouldBindJSON(&input); err != nil {
 		log.Println("Invalid JSON data", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON data"})
 		return
 	}
-	log.Println("Goal data", goal)
+	log.Println("Goal data", input)
 
-	// Validate date format
-	if _, err := time.Parse("2006-01-02", goal.TargetDate.Format("2006-01-02")); err != nil {
-		log.Println("Invalid date format", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format"})
+	// Parse date from string to time.Time
+	parsedDate, err := time.Parse("2006-01-02", input.TargetDate)
+	if err != nil {
+		log.Println("Invalid date format:", input.TargetDate, err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format, expected YYYY-MM-DD"})
 		return
 	}
 
-	// Validate required fields
-	if goal.GoalName == "" || goal.TargetDate.IsZero() || goal.Repetition == "" {
-		log.Println("Missing required fields", goal)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields"})
-		return
+	// Create new goal struct for database
+	goal := models.Goal{
+		UserID:     IsActive.ID,
+		GoalName:   input.GoalName,
+		TargetDate: parsedDate,
+		Repetition: input.Repetition,
 	}
+
 	// set default values
 	goal.UserID = IsActive.ID
 	if goal.Description == "" {
@@ -89,7 +98,7 @@ func CreateGoal(c *gin.Context) {
 			"id":          goal.ID,
 			"goalName":    goal.GoalName,
 			"description": goal.Description,
-			"target_date": goal.TargetDate,
+			"target_date": goal.TargetDate.Format("2006-01-02"), // Return date as string
 			"repetition":  goal.Repetition,
 			"userID":      goal.UserID,
 		},

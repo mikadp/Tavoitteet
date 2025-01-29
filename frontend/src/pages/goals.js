@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { fetchGoals, createGoal, deleteGoal } from '../api/api';
 
 const Goals = () => {
@@ -11,17 +11,40 @@ const Goals = () => {
 
     // Format functions
     const formatDate = (dateString) => {
-        if (!dateString) return 'Päivämäärä puuttuu';
-       
-        const date = typeof dateString === "string" ? new Date(dateString + "T00:00:00Z") : new Date(dateString);
+       if (!dateString) {
+        console.log("📅 Alkuperäinen Päivämäärä:", dateString);
+       } else {
+            console.warn("⚠️ Päivämäärä puuttuu", dateString);
+        }  
 
-        if (isNaN(date.getTime())) return 'Virheellinen päivämäärä';
+        //if datestring is Date-object, use it as is
+        if (dateString instanceof Date) {
+            return dateString.toLocaleDateString('fi-FI', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            });
+        }
+
+        //make sure the datestring is a valid date
+        if (typeof dateString === 'string' && dateString.includes('T')) {
+            dateString = dateString.split('T')[0]; //delete time part
+        }
+       
+        const date = new Date(dateString);
+
+        if (isNaN(date.getTime())) {
+            console.warn("❌ Virheellinen päivämäärä", dateString);
+            return 'Virheellinen päivämäärä';
+        }
         return date.toLocaleDateString('fi-FI',{
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
         });
     };
+
+    // Format repetition
     const formatRepetition = (repetition) => {
         switch (repetition) {
             case 'daily':
@@ -88,8 +111,11 @@ const Goals = () => {
                 target_date: newGoal.target_date,
                 repetition: newGoal.repetition
             });
+            
+            console.log('🔹 Backendin vastaus:', response.data);
+
             if (response?.data) {
-            setGoals(prevGoals => [...prevGoals, response.data]); // update the state directly
+            setGoals((prevGoals) => [...prevGoals, response.data]); // update the state directly
             setNewGoal(initialGoalState); // clear the input field
             setSuccess('✅Tavoite luotu onnistuneesti'); // Show a success message
             } else {
@@ -116,17 +142,26 @@ const Goals = () => {
         }
     };
 
-    const handleGoalNameChange = (e) => {
-        setNewGoal({ ...newGoal, goal_name: e.target.value });
-    };
+    const handleGoalNameChange = useCallback((e) => {
+        setNewGoal((prevGoal => ({ 
+            ...prevGoal, 
+            goal_name: e.target.value 
+        })));
+    }, []);
 
-    const handleTargetDateChange = (e) => {
-        setNewGoal({ ...newGoal, target_date: e.target.value });
-    };
+    const handleTargetDateChange = useCallback((e) => {
+        setNewGoal((prevGoal) => ({ 
+            ...prevGoal, 
+            target_date: e.target.value, 
+        }));
+    }, []);
 
-    const handleRepetitionChange = (e) => {
-        setNewGoal({ ...newGoal, repetition: e.target.value });
-    };
+    const handleRepetitionChange = useCallback((e) => {
+        setNewGoal((prevGoal) => ({ 
+            ...prevGoal, 
+            repetition: e.target.value 
+        }));
+    }, []);
 
     return (
             <div className="p-4">
