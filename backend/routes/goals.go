@@ -42,6 +42,7 @@ func CreateGoal(c *gin.Context) {
 	}
 
 	var IsActive models.User
+	var goal models.Goal
 
 	// Find active user
 	if err := database.DB.Where("is_active = ?", true).First(&IsActive).Error; err != nil {
@@ -60,19 +61,44 @@ func CreateGoal(c *gin.Context) {
 	log.Println("Goal data", input)
 
 	// Parse date from string to time.Time
-	parsedDate, err := time.Parse("2006-01-02", input.TargetDate)
-	if err != nil {
-		log.Println("Invalid date format:", input.TargetDate, err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format, expected YYYY-MM-DD"})
+	var parsedDate time.Time
+	var err error
+	if input.TargetDate != "" {
+		parsedDate, err = time.Parse("2006-01-02", input.TargetDate)
+		if err != nil {
+			log.Println("Invalid date format:", input.TargetDate, err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format, expected YYYY-MM-DD"})
+			return
+		}
+	} else {
+		parsedDate = time.Now()
+	}
+
+	// Check if the parsed date is valid
+	if parsedDate.IsZero() || parsedDate.Month() == 0 || parsedDate.Day() == 0 {
+		log.Println("Invalid date:", input.TargetDate)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date"})
 		return
 	}
 
 	// Create new goal struct for database
-	goal := models.Goal{
-		UserID:     IsActive.ID,
-		GoalName:   input.GoalName,
-		TargetDate: parsedDate,
-		Repetition: input.Repetition,
+	goal = models.Goal{
+		UserID:      IsActive.ID,
+		GoalName:    input.GoalName,
+		TargetDate:  parsedDate,
+		Repetition:  input.Repetition,
+		Description: "Ei kuvausta",
+	}
+
+	//if date is not valid or in the past, return error
+	if goal.TargetDate.Before(time.Now()) {
+		log.Println("Invalid date, date is in the past:", goal.TargetDate)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date, date is in the past"})
+		return
+	}
+	if goal.TargetDate.IsZero() {
+		log.Println("⚠️ Invalid date, date is not set:", goal.TargetDate)
+		goal.TargetDate = time.Now()
 	}
 
 	// set default values

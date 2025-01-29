@@ -11,24 +11,16 @@ const Goals = () => {
 
     // Format functions
     const formatDate = (dateString) => {
-       if (!dateString) {
-        console.log("📅 Alkuperäinen Päivämäärä:", dateString);
-       } else {
-            console.warn("⚠️ Päivämäärä puuttuu", dateString);
-        }  
-
-        //if datestring is Date-object, use it as is
-        if (dateString instanceof Date) {
-            return dateString.toLocaleDateString('fi-FI', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-            });
-        }
-
+       if (!dateString || dateString === "0001-01-01") {
+        console.warn("⚠️ Päivämäärä puuttuu", dateString);
+        return "Virheellinen päivämäärä";
+       }
+    
+       console.log("📅 Alkuperäinen Päivämäärä:", dateString)
+        
         //make sure the datestring is a valid date
-        if (typeof dateString === 'string' && dateString.includes('T')) {
-            dateString = dateString.split('T')[0]; //delete time part
+        if (typeof dateString === "string" && dateString.includes("T")) {
+            dateString = dateString.split("T")[0]; //delete time part
         }
        
         const date = new Date(dateString);
@@ -37,6 +29,7 @@ const Goals = () => {
             console.warn("❌ Virheellinen päivämäärä", dateString);
             return 'Virheellinen päivämäärä';
         }
+
         return date.toLocaleDateString('fi-FI',{
             day: '2-digit',
             month: '2-digit',
@@ -76,10 +69,17 @@ const Goals = () => {
             setLoading(true);
             console.log('Loading goals...');
             const response = await fetchGoals();
-            setGoals(Array.isArray(response.data.data) ? response.data.data : []);
+
+            console.log('🔹 Backend response:', response.data);
+
+            if (Array.isArray(response.data.data)) {
+                setGoals(response.data.data);
+            } else {
+                setGoals([]);
+            }
         } catch (error) {
             setError('Tavoitteiden lataaminen epäonnistui');
-            console.error('Error fetching goals:', error);
+            console.error('❌ Error fetching goals:', error);
         } finally {
             setLoading(false);
         }
@@ -100,24 +100,29 @@ const Goals = () => {
         setSuccess(null);
 
         try {
+
+            //ensure correct date format
+            const formattedDate = new Date(newGoal.target_date).toISOString().split('T')[0];
+
             console.log('Sending goal data:', {
                 goal_name: newGoal.goal_name,
-                target_date: newGoal.target_date,
+                target_date: formattedDate,
                 repetition: newGoal.repetition,
             });
 
             const response = await createGoal({
                 goal_name: newGoal.goal_name,
-                target_date: newGoal.target_date,
+                target_date: formattedDate,
                 repetition: newGoal.repetition
             });
             
-            console.log('🔹 Backendin vastaus:', response.data);
+            console.log("🔹 Backendin vastaus:", response.data);
 
+            // Update the state with the new goal
             if (response?.data) {
-            setGoals((prevGoals) => [...prevGoals, response.data]); // update the state directly
-            setNewGoal(initialGoalState); // clear the input field
-            setSuccess('✅Tavoite luotu onnistuneesti'); // Show a success message
+                setGoals((prevGoals) => [...prevGoals, response.data]);
+                setNewGoal(initialGoalState); // clear the input field
+                setSuccess('✅Tavoite luotu onnistuneesti'); // Show a success message
             } else {
                 throw new error('Invalid response');
             }
@@ -189,7 +194,7 @@ const Goals = () => {
                         {goals.map((goal, index) => (
                             <tr key={goal.id} className={`hover:bg-gray-50 ${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}>
                                 <td className="border border-gray-300 px-4 py-2">{goal.goal_name}</td>
-                                <td className="border border-gray-300 px-4 py-2">{formatDate(goal.target_date)}</td>
+                                <td className="border border-gray-300 px-4 py-2">{goal.target_date? formatDate(goal.target_date): "Ei päivämäärä"}</td>
                                 <td className="border border-gray-300 px-4 py-2">{formatRepetition(goal.repetition)}</td>
                                 <td className="border border-gray-300 px-4 py-2">
                                     <button
