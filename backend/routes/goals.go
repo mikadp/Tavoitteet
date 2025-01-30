@@ -90,7 +90,7 @@ func CreateGoal(c *gin.Context) {
 		Description: "Ei kuvausta",
 	}
 
-	//if date is not valid or in the past, return error
+	// if date is not valid or in the past, return error
 	if goal.TargetDate.Before(time.Now()) {
 		log.Println("Invalid date, date is in the past:", goal.TargetDate)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date, date is in the past"})
@@ -119,16 +119,8 @@ func CreateGoal(c *gin.Context) {
 	log.Println("Goal created successfully", goal)
 
 	// Return the created goal
-	c.JSON(http.StatusOK, gin.H{
-		"data": gin.H{
-			"id":          goal.ID,
-			"goalName":    goal.GoalName,
-			"description": goal.Description,
-			"target_date": goal.TargetDate.Format("2006-01-02"), // Return date as string
-			"repetition":  goal.Repetition,
-			"userID":      goal.UserID,
-		},
-	})
+	c.JSON(http.StatusOK, gin.H{"data": goal})
+
 }
 
 // Delete goal (optional)

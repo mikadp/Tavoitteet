@@ -11,19 +11,21 @@ const Goals = () => {
 
     // Format functions
     const formatDate = (dateString) => {
-       if (!dateString || dateString === "0001-01-01") {
-        console.warn("⚠️ Päivämäärä puuttuu", dateString);
-        return "Virheellinen päivämäärä";
+        
+        // console.log("📅 Alkuperäinen Päivämäärä:", dateString);
+
+        //check if the date is missing
+        if (!dateString || dateString === "0001-01-01") {
+            console.warn("⚠️ Päivämäärä puuttuu", dateString);
+            return "Virheellinen päivämäärä";
        }
-    
-       console.log("📅 Alkuperäinen Päivämäärä:", dateString)
         
         //make sure the datestring is a valid date
         if (typeof dateString === "string" && dateString.includes("T")) {
             dateString = dateString.split("T")[0]; //delete time part
         }
        
-        const date = new Date(dateString);
+        const date = new Date(dateString.replace(/-/g, '/'));
 
         if (isNaN(date.getTime())) {
             console.warn("❌ Virheellinen päivämäärä", dateString);
@@ -73,7 +75,11 @@ const Goals = () => {
             console.log('🔹 Backend response:', response.data);
 
             if (Array.isArray(response.data.data)) {
-                setGoals(response.data.data);
+                const formattedGoals = response.data.data.map((goal) => ({
+                    ...goal,
+                    target_date: goal.target_date || "0001-01-01", // Handle null values
+                }));
+                setGoals(formattedGoals);
             } else {
                 setGoals([]);
             }
@@ -120,7 +126,7 @@ const Goals = () => {
 
             // Update the state with the new goal
             if (response?.data) {
-                setGoals((prevGoals) => [...prevGoals, response.data]);
+                setGoals((prevGoals) => [...prevGoals, response.data.data]);
                 setNewGoal(initialGoalState); // clear the input field
                 setSuccess('✅Tavoite luotu onnistuneesti'); // Show a success message
             } else {
@@ -135,6 +141,11 @@ const Goals = () => {
     };
 
     const handleDeleteGoal = async (goalId) => {
+        if (!goalId) {
+            console.error("❌ Cannot delete: goal id is undefined:", goalId);
+            return;
+        }
+
         setLoading(true);
         try {
             await deleteGoal(goalId);
@@ -148,10 +159,10 @@ const Goals = () => {
     };
 
     const handleGoalNameChange = useCallback((e) => {
-        setNewGoal((prevGoal => ({ 
+        setNewGoal((prevGoal) => ({ 
             ...prevGoal, 
             goal_name: e.target.value 
-        })));
+        }));
     }, []);
 
     const handleTargetDateChange = useCallback((e) => {
