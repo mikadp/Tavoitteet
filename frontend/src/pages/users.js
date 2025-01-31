@@ -37,7 +37,7 @@ const Users = () => {
             return;
         }
         try {
-            await createUser({ Name: newUserName }); 
+            await createUser({ Username: newUserName }); 
             setNewUserName(''); // clear the input field
             loadUsers(); // fetch the updated list of users
         } catch (error) {
