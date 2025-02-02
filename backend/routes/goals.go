@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Get all goals
+// Get all goals (only for admin)
 func GetGoals(c *gin.Context) {
 	var goals []models.Goal
 	database.DB.Find(&goals)
@@ -18,39 +18,32 @@ func GetGoals(c *gin.Context) {
 }
 
 // Get goals by active user
-func GetActiveUserGoals(c *gin.Context) {
-	var IsActive models.User
+func GetUserGoals(c *gin.Context) {
 
-	// Find active user
-	if err := database.DB.Where("is_active = ?", true).First(&IsActive); err.Error != nil {
-		c.JSON(http.StatusOK, gin.H{"data": []models.Goal{}})
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
 		return
 	}
 
 	var goals []models.Goal
-	database.DB.Where("user_id = ?", IsActive.ID).Find(&goals)
+	database.DB.Where("user_id = ?", userID).Find(&goals)
 	c.JSON(http.StatusOK, gin.H{"data": goals})
 }
 
 // Create a new goal
 func CreateGoal(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
+		return
+	}
 
 	var input struct {
 		GoalName   string `json:"goal_name"`
 		TargetDate string `json:"target_date"`
 		Repetition string `json:"repetition"`
 	}
-
-	var IsActive models.User
-	var goal models.Goal
-
-	// Find active user
-	if err := database.DB.Where("is_active = ?", true).First(&IsActive).Error; err != nil {
-		log.Println("Active user not found", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Active user not found"})
-		return
-	}
-	log.Println("Active user found", IsActive)
 
 	// Bind JSON -> Input (string)
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -81,30 +74,28 @@ func CreateGoal(c *gin.Context) {
 		return
 	}
 
+	// if date is not valid or in the past, return error
+	if parsedDate.Before(time.Now()) {
+		log.Println("Invalid date, date is in the past:", parsedDate)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date, date is in the past"})
+		return
+	}
+
+	//Ensure that user ID is correct
+	uid, ok := userID.(uint)
+	if !ok {
+		log.Println("Invalid user ID:", userID)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
 	// Create new goal struct for database
-	goal = models.Goal{
-		UserID:      IsActive.ID,
+	goal := models.Goal{
+		UserID:      uid,
 		GoalName:    input.GoalName,
 		TargetDate:  parsedDate,
 		Repetition:  input.Repetition,
 		Description: "Ei kuvausta",
-	}
-
-	// if date is not valid or in the past, return error
-	if goal.TargetDate.Before(time.Now()) {
-		log.Println("Invalid date, date is in the past:", goal.TargetDate)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date, date is in the past"})
-		return
-	}
-	if goal.TargetDate.IsZero() {
-		log.Println("⚠️ Invalid date, date is not set:", goal.TargetDate)
-		goal.TargetDate = time.Now()
-	}
-
-	// set default values
-	goal.UserID = IsActive.ID
-	if goal.Description == "" {
-		goal.Description = "Ei kuvausta"
 	}
 
 	log.Println("Goal data before save:", goal)
@@ -125,10 +116,20 @@ func CreateGoal(c *gin.Context) {
 
 // Delete goal (optional)
 func DeleteGoal(c *gin.Context) {
-	params := c.Param("id")
-	if err := database.DB.Delete(&models.Goal{}, params); err.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found!"})
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": "Goal deleted successfully"})
+
+	goalID := c.Param("id")
+	var goal models.Goal
+	if err := database.DB.Where("id = ? AND user_id = ?", goalID, userID).First(&goal).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Goal not found!"})
+		return
+	}
+
+	database.DB.Delete(&goal)
+	c.JSON(http.StatusOK, gin.H{"message": "Goal deleted successfully!"})
+
 }

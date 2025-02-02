@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/database"
+	"backend/middleware"
 	"backend/models"
 	"backend/routes"
 	"log"
@@ -29,7 +30,7 @@ func main() {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},          //Frontend
 		AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE"}, // Sallitut HTTP-metodit
-		AllowHeaders:     []string{"Content-Type"},                   // Sallitut HTTP-otsikot
+		AllowHeaders:     []string{"Content-Type", "Authorization"},  // Sallitut HTTP-otsikot
 		AllowCredentials: true,                                       // Evästeiden sallinta
 	}))
 
@@ -48,22 +49,26 @@ func main() {
 	//API-reitit
 	api := r.Group("/api")
 	{
+		// Julkiset reitit
+		api.POST("/register", routes.Register)
+		api.POST("/login", routes.Login)
 
-		// API-reitit käyttäjille
+		// API-reitit admin-käyttöön
 		users := api.Group("/users")
+		users.Use(middleware.RequireAuth) // Käytä middlewarea kaikissa käyttäjäreiteissä
 		{
-			users.GET("/", routes.GetUsers)
-			users.POST("/", routes.CreateUser)
+			users.GET("/", routes.GetUsers)    // Admin: Hae kaikki käyttäjät
+			users.POST("/", routes.CreateUser) // Admin: Luo uusi käyttäjä
 			users.PATCH("/:id", routes.UpdateUserActiveStatus)
 			users.DELETE("/:id", routes.DeleteUser)
 		}
 
 		// API-reitit tavoitteille
 		goals := api.Group("/goals")
+		goals.Use(middleware.RequireAuth) // Käytä middlewarea kaikissa tavoitereiteissä
 		{
-			goals.GET("/", routes.GetGoals)
+			goals.GET("/", routes.GetUserGoals)
 			goals.POST("/", routes.CreateGoal)
-			goals.GET("/active", routes.GetActiveUserGoals)
 			goals.DELETE("/:id", routes.DeleteGoal)
 		}
 	}

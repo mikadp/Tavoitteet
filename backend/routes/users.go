@@ -9,8 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Get all users
+// Get all users (admin only)
 func GetUsers(c *gin.Context) {
+	role, exists := c.Get("role")
+	if !exists || role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	var users []models.User
 	database.DB.Find(&users)
 	c.JSON(http.StatusOK, gin.H{"data": users})
