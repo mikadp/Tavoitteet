@@ -26,12 +26,20 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	// username not empty
+	if input.Username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username is required"})
+		return
+	}
+
+	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 		return
 	}
 
+	//create user
 	user := models.User{
 		Username: input.Username,
 		Password: string(hashedPassword),
@@ -41,6 +49,8 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
 }
 
 // User Login

@@ -4,6 +4,8 @@ import Navbar from './components/Navbar.js';
 import Users from './pages/users.js';
 import Goals from './pages/goals.js';
 import Calendar from './pages/calendar.js';
+import Login from './pages/login.js';
+import Register from './pages/register.js';
 
 function App() {
   return (
