@@ -18,12 +18,7 @@ export const deleteGoal = (id) => api.delete(`/goals/${id}`);      // Poistaa ta
 export const fetchActiveUserGoals = () => api.get("/goals/active"); // Hakee aktiivisen käyttäjän tavoitteet
 
 // User specific goals
-export const fetchUserGoals = (token) =>
-    api.get("/goals/user", {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+export const getUserGoals = (token) => api.get("/goals/user", { headers: { Authorization: `Bearer ${token}`,},});
 
 
 export default api;
