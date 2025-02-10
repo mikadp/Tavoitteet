@@ -6,6 +6,7 @@ import Goals from './pages/goals.js';
 import Calendar from './pages/calendar.js';
 import Login from './pages/login.js';
 import Register from './pages/register.js';
+import Dashboard from './pages/dashboard.js';
 
 function App() {
   return (
@@ -18,8 +19,11 @@ function App() {
               element={
                 <div className="text-center">
                   <h1 className="text-4xl font-bold mb-4">Tervetuloa!</h1>
-                  <p className="text-lg">Tämä on vain etusivu.</p>
+                  <p className="text-lg">etusivu.</p>
                 </div>} />
+              <Route path="/login" element={<Login setToken={setToken}  />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/goals" element={<Goals />} />
               <Route path="/users" element={<Users />} />
               <Route path="/calendar" element={<Calendar />} />
