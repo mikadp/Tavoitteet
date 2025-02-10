@@ -1,6 +1,6 @@
 // Dashboard page for user-specific goals
 import React, { useEffect, useState } from "react";
-import { getUserGoals } from "../api/auth";
+import { getUserGoals } from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = ({ token }) => {

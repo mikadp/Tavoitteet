@@ -14,7 +14,7 @@ const Register = () => {
         setError(null);
 
         try {
-            await registerUser(usernamem, password);
+            await registerUser(username, password);
             alert("✅ Registration successful!");
             navigate("/login") //Redirect to login page
         } catch (error){

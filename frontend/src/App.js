@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar.js';
 import Users from './pages/users.js';
@@ -9,6 +9,8 @@ import Register from './pages/register.js';
 import Dashboard from './pages/dashboard.js';
 
 function App() {
+  const [token, setToken] = useState(localStorage.getItem("token"));
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -23,7 +25,7 @@ function App() {
                 </div>} />
               <Route path="/login" element={<Login setToken={setToken}  />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard token={token} />} />
               <Route path="/goals" element={<Goals />} />
               <Route path="/users" element={<Users />} />
               <Route path="/calendar" element={<Calendar />} />
