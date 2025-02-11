@@ -17,6 +17,9 @@ const Navbar = () => {
                 <li>
                     <Link to="/Calendar" className="text-black hover:text-gray-300 font-medium">Kalenteri</Link>
                 </li>
+                <li>
+                    <Link to="/Dashboard" className="text-black hover:text-gray-300 font-medium">Hallintapaneeli</Link>
+                </li>
             </ul>
         </nav>
     );

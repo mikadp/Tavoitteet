@@ -34,6 +34,13 @@ const Register = () => {
                     onChange={(e) => setUsername(e.target.value)}
                     className="border p-2 rounded mb-2"
                 />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e)=> setPassword(e.target.value)}
+                    className="border p-2 rounded mb-2"
+                />
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded">
                     Register
                 </button>
