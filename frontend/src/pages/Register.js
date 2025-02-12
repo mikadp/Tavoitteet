@@ -1,11 +1,12 @@
 //Page for user register
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import { registerUser } from "../api/auth";
 import { useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
 
 const Register = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const { register } = useContext(AuthContext);
+    const [userData, setUserData] = useState({ username: "", password: ""});
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -14,7 +15,7 @@ const Register = () => {
         setError(null);
 
         try {
-            await registerUser(username, password);
+            await register(userData);
             alert("✅ Registration successful!");
             navigate("/login") //Redirect to login page
         } catch (error){
@@ -30,15 +31,15 @@ const Register = () => {
                 <input
                     type="text"
                     placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={userData.username}
+                    onChange={(e) => setUserData({ ...userData, username: e.target.value })}
                     className="border p-2 rounded mb-2"
                 />
                 <input
                     type="password"
                     placeholder="Password"
-                    value={password}
-                    onChange={(e)=> setPassword(e.target.value)}
+                    value={userData.password}
+                    onChange={(e)=> setUserData({ ...userData, password: e.target.value })}
                     className="border p-2 rounded mb-2"
                 />
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded">

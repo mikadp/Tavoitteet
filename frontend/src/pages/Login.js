@@ -1,13 +1,11 @@
 // Login and store JWT token
 import React, { useContext, useState } from 'react';
-import { loginUser } from '../api/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
-const Login = ({ setToken }) => {
+const Login = () => {
     const { login } = useContext(AuthContext);
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [credentials, setCredentials] = useState({ username: "", password: "" });
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -15,10 +13,7 @@ const Login = ({ setToken }) => {
         e.preventDefault();
         setError(null);
         try {
-            const response = await api.post("/login", { username, password });
-            login(response.data)
-            //localStorage.setItem('token', response.token);
-            //setToken(response.data.token); // update state
+            await login(credentials); //use login func from AuthContext
             navigate("/") //Redirect to frontpage
         } catch (error) {
             setError(error.response?.data?.error || 'Kirjautuminen epäonnistui');
@@ -33,16 +28,16 @@ const Login = ({ setToken }) => {
                 <input
                     type="text"
                     placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={credentials.username}
+                    onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
                     required
                     className="border p-2 rounded mb-2"
                     />
                 <input
                     type="password"
                     placeholder="Password"
-                    value={password}
-                    onChange={(e)=> setPassword(e.target.value)}
+                    value={credentials.password}
+                    onChange={(e)=> setCredentials({ ...credentials, password: e.target.value })}
                     required
                     className="border p-2 rounded mb-2"
                 />
@@ -50,7 +45,9 @@ const Login = ({ setToken }) => {
                     Login
                 </button>
             </form>
-            <p>Don't have an account ? <a href="/register">Register Here</a></p>
+            <p>
+                Don't have an account ? <Link to="/register" className="text-blue-500">Rekisteröidy</Link>
+            </p>
         </div>
     );
 };
