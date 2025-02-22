@@ -2,6 +2,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import { loginUser } from '../api/auth';
 
 const Login = () => {
     const { login } = useContext(AuthContext);
@@ -13,8 +14,10 @@ const Login = () => {
         e.preventDefault();
         setError(null);
         try {
-            await login(credentials); //use login func from AuthContext
-            navigate("/") //Redirect to frontpage
+            const response = await loginUser(credentials); // Use loginUser function from auth.js
+            login(response.data); //get user from response
+            
+            navigate('/'); // Redirect to home page
         } catch (error) {
             setError(error.response?.data?.error || 'Kirjautuminen epäonnistui');
         }
@@ -46,7 +49,8 @@ const Login = () => {
                 </button>
             </form>
             <p>
-                Don't have an account ? <Link to="/register" className="text-blue-500">Rekisteröidy</Link>
+                Don't have an account ?{' '}
+                <Link to="/register" className="text-blue-500">Rekisteröidy</Link>
             </p>
         </div>
     );

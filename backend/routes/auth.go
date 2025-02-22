@@ -39,10 +39,19 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	// Assign role
+	var count int64
+	database.DB.Model(&models.User{}).Count(&count)
+	role := "user"
+	if count == 0 {
+		role = "admin" // First user is admin
+	}
+
 	//create user
 	user := models.User{
 		Username: input.Username,
 		Password: string(hashedPassword),
+		Role:     role,
 	}
 
 	if err := database.DB.Create(&user).Error; err != nil {
@@ -50,7 +59,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "User created successfully", "Role": user.Role})
 }
 
 // User Login
@@ -88,4 +97,20 @@ func Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+}
+
+func GetCurrentUser(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var user models.User
+	if err := database.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

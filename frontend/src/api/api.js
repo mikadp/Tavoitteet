@@ -10,6 +10,7 @@ export const fetchUsers = () => api.get("/users/");                // Hakee kaik
 export const createUser = (data) => api.post("/users/", data);     // Luo uuden käyttäjän
 export const updateUserStatus = (id) => api.patch(`/users/${id}`); // Päivittää käyttäjän tilan
 export const deleteUser = (id) => api.delete(`/users/${id}`);      // Poistaa käyttäjän
+export const fetchUserProfile = () => api.get("/me");              // Hakee käyttäjän profiilin
     
 // Tavoitteet-API
 export const fetchGoals = () => api.get("/goals/");                // Hakee kaikki tavoitteet
