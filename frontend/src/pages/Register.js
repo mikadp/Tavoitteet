@@ -1,6 +1,5 @@
 //Page for user register
 import React, {useContext, useState} from "react";
-import { registerUser } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 
