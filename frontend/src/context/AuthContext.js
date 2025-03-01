@@ -1,8 +1,7 @@
 // Global authentication context. All components can check if user is logged in.
 
 import React, { createContext, useState, useEffect } from "react";
-import { registerUser, loginUser } from "../api/auth";
-import { fetchUserProfile } from "../api/api";
+import { fetchUserProfile, registerUser, loginUser } from "../api/api";
 import api from "../api/api";
 
 const AuthContext = createContext();
@@ -39,9 +38,9 @@ export const AuthProvider = ({ children }) => {
     const login = async (credentials) => {
         try {
             const response = await loginUser(credentials);
-            setUser(response.data);
             localStorage.setItem("token", response.data.token);
             api.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
+            setUser(response.data.user);
         } catch (error) {
             console.error("Login failed:", error.response?.data?.error || error);
             throw error;
@@ -51,10 +50,12 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData) => {
         try {
             const response = await registerUser(userData);
-            setUser(response.data.user);
             localStorage.setItem("token", response.data.token);
+            api.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
+            setUser(response.data.user);
         } catch (error) {
-            console.error("Registration failed:", error);
+            console.error("Registration failed:", error.response?.data?.error || error);
+            throw error;
         }
     };
 
