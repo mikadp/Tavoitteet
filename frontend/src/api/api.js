@@ -1,8 +1,14 @@
 import axios from 'axios';
 
-// Luo axios instanssi perus-URL:llä
+// Debug log to verify the API URL
+console.log("API Base URL:", process.env.REACT_APP_API_URL);
+
+/*const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL
+});*/
+
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL,
+    baseURL: "http://localhost:8080/api"
 });
 
 // Käyttäjä-API 
@@ -22,6 +28,5 @@ export const fetchActiveUserGoals = () => api.get("/goals/active"); // Hakee akt
 
 // User specific goals
 export const getUserGoals = (token) => api.get("/goals/user", { headers: { Authorization: `Bearer ${token}`,},});
-
 
 export default api;

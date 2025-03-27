@@ -14,6 +14,7 @@ const Register = () => {
         setError(null);
 
         try {
+            
             await register(userData);
             alert("✅ Registration successful!");
             navigate("/login") //Redirect to login page
