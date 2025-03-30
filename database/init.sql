@@ -5,7 +5,7 @@ CREATE TABLE users (
     is_active BOOLEAN DEFAULT FALSE
     );
     
-CREATE UNIQUE INDEX unique_active_user ON users (id) WHERE is_active = FALSE;
+CREATE UNIQUE INDEX unique_active_user ON users (id) WHERE is_active = TRUE;
 
 CREATE TABLE goals (
     id SERIAL PRIMARY KEY,
