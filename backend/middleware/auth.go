@@ -38,7 +38,7 @@ func RequireAuth(c *gin.Context) {
 
 	// Parse the token
 	claims := &jwt.StandardClaims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		return jwtSecret, nil
 	})
 

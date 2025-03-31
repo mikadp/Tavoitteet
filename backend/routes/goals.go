@@ -17,7 +17,7 @@ func GetGoals(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": goals})
 }
 
-// Get goals by active user
+// Get goals for a specific user
 func GetUserGoals(c *gin.Context) {
 
 	userID, exists := c.Get("user_id")

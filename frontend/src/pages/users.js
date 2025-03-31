@@ -45,16 +45,6 @@ const Users = () => {
         }
     };
 
-    const handleSetActiveUser = async (ID) => {
-        try {
-            await updateUserStatus(ID); // call the API to set the user active
-            alert('Käyttäjä asetettu aktiiviseksi');
-            loadUsers(); // fetch the updated list of users
-        } catch (error) {
-            console.error('Error setting user active:', error);
-        }
-    };
-
     const handleDeleteUser = async (ID) => {
         try {
             await deleteUser(ID);
@@ -85,13 +75,7 @@ const Users = () => {
                             key={user.ID}
                             className="border p-2 mb-2 rounded flex justify-between"
                         >
-                            {user.Name} {user.IsActive && <span className="text-green-600">(Aktiivinen)</span>}
-                            <button
-                                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                                onClick={() => handleSetActiveUser(user.ID)}
-                            >
-                                Aseta aktiiviseksi
-                            </button>
+                            {user.Name}
                             <button
                                 className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                                 onClick={() => handleDeleteUser(user.ID)}

@@ -11,7 +11,6 @@ type User struct {
 	Password  string    `gorm:"not null" json:"-"`               //Password of the user
 	Role      string    `gorm:"default:false" json:"role"`       //Role of the user
 	Goals     []Goal    `gorm:"foreignKey:UserID"`               //Relationship to goals
-	IsActive  bool      `gorm:"default:false" json:"is_active"`  //Active status
-	CreatedAt time.Time `gorm:"autoCreateTime"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`                  //Created time of the user
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`                  //Updated time of the user
 }

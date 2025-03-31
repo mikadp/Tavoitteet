@@ -53,13 +53,18 @@ func main() {
 		api.POST("/register", routes.Register)
 		api.POST("/login", routes.Login)
 
+		// reitit käyttäjätietojen hakemiseen
+		api.GET("/me", middleware.RequireAuth, routes.GetCurrentUser)
+
+		//logout-reitti tbd
+		//api.POST("/logout", middleware.RequireAuth, routes.Logout)
+
 		// API-reitit admin-käyttöön
 		users := api.Group("/users")
 		users.Use(middleware.RequireAuth) // Käytä middlewarea kaikissa käyttäjäreiteissä
 		{
 			users.GET("/", routes.GetUsers)    // Admin: Hae kaikki käyttäjät
 			users.POST("/", routes.CreateUser) // Admin: Luo uusi käyttäjä
-			users.PATCH("/:id", routes.UpdateUserActiveStatus)
 			users.DELETE("/:id", routes.DeleteUser)
 		}
 
