@@ -40,5 +40,20 @@ services:
       retries: 5
     container_name: database
 
+  tests:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    volumes:
+      - ./tests:/usr/src/app/tests
+      - ./results:/usr/src/app/results
+    env_file:
+      - variables.env
+    depends_on:
+      - frontend
+      - backend
+      - database
+    container_name: tests
+
 volumes:
   postgres_data:

@@ -28,5 +28,9 @@ backend/go.sum
 database/go.mod
 database/go.sum
 
+#tests
+/results
+
 #Variables
 variables.env
+variables.robot

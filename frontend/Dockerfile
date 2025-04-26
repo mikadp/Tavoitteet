@@ -1,5 +1,5 @@
 # Vaihe 1: Rakennusvaihe
-FROM node:18 AS frontend-builder
+FROM node:23-slim AS frontend-builder
 
 WORKDIR /app
 COPY package*.json ./
