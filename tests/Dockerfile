@@ -15,13 +15,14 @@ RUN apk add  --no-cache \
     gnupg \
     && apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev
 
-    # Install Robot Framework and necessary libraries
-RUN pip install --no-cache-dir \
-    robotframework \
-    robotframework-seleniumlibrary \
-    robotframework-requests \
-    robotframework-jsonlibrary \
-    selenium
+# Install Robot Framework and necessary libraries
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir \
+        robotframework \
+        robotframework-seleniumlibrary \
+        robotframework-requests \
+        robotframework-jsonlibrary \
+        selenium
 
 # Install Chrome
 RUN apk add --no-cache \
