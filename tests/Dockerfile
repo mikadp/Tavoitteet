@@ -4,10 +4,8 @@ FROM python:alpine
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-COPY . .
-
 # Install system dependencies
-RUN apk add  --no-cache \
+RUN apk add --no-cache \
     curl \
     git \
     unzip \
@@ -24,7 +22,7 @@ RUN pip install --upgrade pip && \
         robotframework-jsonlibrary \
         selenium
 
-# Install Chrome
+# Install Chrome and dependencies
 RUN apk add --no-cache \
     nss \
     freetype \
@@ -37,6 +35,22 @@ RUN apk add --no-cache \
     chromium \
     chromium-chromedriver
 
+# Download and install ChromeDriver to a fixed location
+RUN CHROME_DRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
+    mkdir -p /usr/local/bin/chromedriver && \
+    wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip && \
+    unzip /tmp/chromedriver.zip -d /usr/local/bin/chromedriver && \
+    chmod +x /usr/local/bin/chromedriver/chromedriver && \
+    rm /tmp/chromedriver.zip
+
+# Create necessary directories
+RUN mkdir -p /usr/src/app/tests && \
+    mkdir -p /usr/src/app/results && \
+    mkdir -p /usr/src/app/resources
+
+# Set environment variables for ChromeDriver and Chrome
+ENV SELENIUM_WEBDRIVER_CHROMEDRIVER_PATH=/usr/local/bin/chromedriver/chromedriver
+ENV CHROME_BIN=/usr/bin/chromium-browser
 
 # Expose a volume for test files
 VOLUME ["/app/tests"]

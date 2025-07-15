@@ -46,9 +46,13 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./tests:/usr/src/app/tests
+      - ./tests/resources:/usr/src/app/resources
       - ./results:/usr/src/app/results
     env_file:
       - variables.env
+    environment:
+      - SELENIUM_WEBDRIVER_CHROMEDRIVER_PATH=/usr/local/bin/chromedriver/chromedriver
+      - CHROME_BIN=/usr/bin/chromium-browser
     depends_on:
       - frontend
       - backend
