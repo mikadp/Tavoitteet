@@ -24,6 +24,8 @@ RUN pip install --upgrade pip && \
 
 # Install Chrome and dependencies
 RUN apk add --no-cache \
+    chromium \
+    chromium-chromedriver \
     nss \
     freetype \
     harfbuzz \
@@ -31,17 +33,7 @@ RUN apk add --no-cache \
     && apk add --no-cache --virtual .chrome-deps \
     alsa-lib \
     xvfb \
-    && apk add --no-cache \
-    chromium \
-    chromium-chromedriver
-
-# Download and install ChromeDriver to a fixed location
-RUN CHROME_DRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
-    mkdir -p /usr/local/bin/chromedriver && \
-    wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip && \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin/chromedriver && \
-    chmod +x /usr/local/bin/chromedriver/chromedriver && \
-    rm /tmp/chromedriver.zip
+    && apk add --no-cache
 
 # Create necessary directories
 RUN mkdir -p /usr/src/app/tests && \
@@ -49,7 +41,7 @@ RUN mkdir -p /usr/src/app/tests && \
     mkdir -p /usr/src/app/resources
 
 # Set environment variables for ChromeDriver and Chrome
-ENV SELENIUM_WEBDRIVER_CHROMEDRIVER_PATH=/usr/local/bin/chromedriver/chromedriver
+ENV SELENIUM_WEBDRIVER_CHROMEDRIVER_PATH=/usr/bin/chromedriver
 ENV CHROME_BIN=/usr/bin/chromium-browser
 
 # Expose a volume for test files

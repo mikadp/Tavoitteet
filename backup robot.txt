@@ -1,0 +1,49 @@
+*** Settings ***
+Library     SeleniumLibrary
+Library     Collections
+Library     Process
+Resource    ../resources/variables.robot
+
+*** Test Cases ***
+Navigate To Homepage And Register New User
+    ${RANDOM_STRING}=    Generate Random String    10
+    Set Test Variable    ${RANDOM_STRING}
+    Create Directory    /tmp/chrome-user-data-${RANDOM_STRING}
+    ${CHROME_OPTIONS}=    Set Chrome Options    ${RANDOM_STRING}
+    Open Browser    ${HOMEPAGE_URL}    ${BROWSER}    options=${CHROME_OPTIONS}
+    Click Link    Rekisteröidy
+    Input Text    id=Username    ${USERNAME}
+    Input Text    id=Password    ${PASSWORD}
+    Click Button    id=Register
+    Page Should Contain    Registration successful
+    [Teardown]    Custom Teardown
+
+*** Keywords ***
+Generate Random String
+    [Arguments]    ${length}
+    ${random_string}=    Evaluate    ''.join(random.choices(string.ascii_letters + string.digits, k=${length}))    modules=random, string
+    RETURN    ${random_string}
+
+Set Chrome Options
+    [Arguments]    ${random_string}
+    ${chrome_options}=    Evaluate    selenium.webdriver.ChromeOptions()
+    Call Method    ${chrome_options}    add_argument    --no-sandbox
+    Call Method    ${chrome_options}    add_argument    --disable-dev-shm-usage
+    #Call Method    ${chrome_options}    add_argument    --user-data-dir=/tmp/chrome-user-data-${random_string}
+    RETURN    ${chrome_options}
+
+# This keyword is called automatically after each test case
+# It can be used to clean up resources or perform final actions
+Custom Teardown
+    Close Browser
+    Remove Directory    /tmp/chrome-user-data-${RANDOM_STRING}
+
+# This keyword is used to create a directory for Chrome user data    
+Create Directory
+    [Arguments]    ${directory}
+    Run Process    mkdir    -p    ${directory}
+
+# This keyword is used to remove a directory
+Remove Directory
+    [Arguments]    ${directory}
+    Run Process    rm    -rf    ${directory}
