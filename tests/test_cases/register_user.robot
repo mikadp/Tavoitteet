@@ -7,6 +7,7 @@ Resource    ../resources/variables.robot
 
 *** Variables ***
 ${HOMEPAGE_URL}    http://frontend:80
+${LOGIN_PAGE_URL}   http://frontend:80/login
 ${BROWSER}         chrome
 ${USERNAME}         testuser2
 ${PASSWORD}         testpw2
@@ -43,10 +44,21 @@ Navigate To Homepage And Register New User
     
     Click Link    Rekisteröidy
     Log    Clicked on 'Rekisteröidy' link
-    Input Text    id=Username    ${USERNAME}
-    Input Text    id=Password    ${PASSWORD}
-    Click Button    id=Register
-    Page Should Contain    Registration successful
+    Wait Until Page Contains Element    css:input[placeholder="Username"]   5s   
+    Input Text  css:input[placeholder="Username"]   ${USERNAME}
+
+    Wait Until Page Contains Element    css:input[placeholder="Password"]   5s
+    Input Text    css:input[placeholder="Password"]    ${PASSWORD}
+    
+    Click Button    css:button#submit_register
+    
+    ${alert_text}=    Get Alert Message
+    Log ${alert_text}
+    Handle Alert    expected_text=✅ Registration successful!    timeout=5s
+
+    #check redirecting
+    Wait Until Page Contains    ${LOGIN_PAGE_URL}   5s
+
     [Teardown]    Custom Teardown    ${CHROME_DATA_DIR}
     Log    Test case completed
 

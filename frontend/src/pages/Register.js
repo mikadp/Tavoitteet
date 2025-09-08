@@ -42,7 +42,7 @@ const Register = () => {
                     onChange={(e)=> setUserData({ ...userData, password: e.target.value })}
                     className="border p-2 rounded mb-2"
                 />
-                <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+                <button type="submit" id="submit_register" className="bg-blue-500 text-white p-2 rounded">
                     Register
                 </button>
             </form>
