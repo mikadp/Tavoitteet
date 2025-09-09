@@ -7,17 +7,15 @@ const Register = () => {
     const { register } = useContext(AuthContext);
     const [userData, setUserData] = useState({ username: "", password: ""});
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState("");
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        setError(null);
-
         try {
-            
             await register(userData);
-            alert("✅ Registration successful!");
-            navigate("/login") //Redirect to login page
+            setSuccess("✅ Registration successful!");
+            //navigate("/login") //Redirect to login page
         } catch (error){
             setError(error.response?.data?.error || "Registration failed");
         }
@@ -26,7 +24,10 @@ const Register = () => {
     return (
         <div className="flex flex-col items-centre p-6">
             <h1 className="text-2x1 font-bold mb-4">Register</h1>
+            
             {error && <p className="text-red-500">{error}</p>}
+            {success && <p className="text-green-500">{success}</p>}
+
             <form onSubmit={handleRegister} className="flex flex-col">
                 <input
                     type="text"

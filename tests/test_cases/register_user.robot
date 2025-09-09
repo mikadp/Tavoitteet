@@ -51,10 +51,7 @@ Navigate To Homepage And Register New User
     Input Text    css:input[placeholder="Password"]    ${PASSWORD}
     
     Click Button    css:button#submit_register
-    
-    ${alert_text}=    Get Alert Message
-    Log ${alert_text}
-    Handle Alert    expected_text=✅ Registration successful!    timeout=5s
+    Wait Until Page Contains     ✅ Registration successful!    timeout=5s
 
     #check redirecting
     Wait Until Page Contains    ${LOGIN_PAGE_URL}   5s
