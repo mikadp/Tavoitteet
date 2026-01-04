@@ -4,6 +4,7 @@ import (
 	"backend/database"
 	"backend/models"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +12,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtSecret = []byte("your_jwt_secret")
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 // User Registration
 func Register(c *gin.Context) {

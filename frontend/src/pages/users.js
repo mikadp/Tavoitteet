@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { fetchUsers, createUser, updateUserStatus, deleteUser } from "../api/api";
+import { useEffect, useState } from "react";
+import { fetchUsers, createUser, deleteUser } from "../api/api";
 
 const Users = () => {
     const [users, setUsers] = useState([]); // List of users, initially empty
     const [newUserName, setNewUserName] = useState('');
     const [loading, setLoading] = useState(true); // For loading animation
-    const [error, setError] = useState(''); // For error messages
+    const [setError] = useState(''); // For error messages
 
     useEffect(() => {
         console.log("Users state updated:", users); // check the users state
@@ -75,14 +75,14 @@ const Users = () => {
                             key={user.ID}
                             className="border p-2 mb-2 rounded flex justify-between"
                         >
-                            {user.Name}
+                            {user.Username}
                             <button
                                 className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                                 onClick={() => handleDeleteUser(user.ID)}
                             >
                                 Poista käyttäjä
                             </button>
-                            </li>
+                        </li>
                     ))}
                     </ul>
             )}

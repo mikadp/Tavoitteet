@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Debug log to verify the API URL
-console.log("API Base URL:", process.env.REACT_APP_API_URL);
+//console.log("API Base URL:", process.env.REACT_APP_API_URL);
 
 /*const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
@@ -27,6 +27,6 @@ export const deleteGoal = (id) => api.delete(`/goals/${id}`);      // Poistaa ta
 export const fetchActiveUserGoals = () => api.get("/goals/active"); // Hakee aktiivisen käyttäjän tavoitteet
 
 // User specific goals
-export const getUserGoals = (token) => api.get("/goals/user", { headers: { Authorization: `Bearer ${token}`,},});
+export const getUserGoals = () => api.get("/goals/");
 
 export default api;

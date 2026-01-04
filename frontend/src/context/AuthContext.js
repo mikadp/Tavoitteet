@@ -1,14 +1,34 @@
 // Global authentication context. All components can check if user is logged in.
 
-import React, { createContext, useState, useEffect } from "react";
-import { fetchUserProfile, registerUser, loginUser } from "../api/api";
-import api from "../api/api";
+import { createContext, useState, useEffect } from "react";
+import api, { fetchUserProfile, registerUser, loginUser } from "../api/api";
+
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    // Setup axios interceptor for 401 responses
+    useEffect(() => {
+        const responseInterceptor = api.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response?.status === 401) {
+                    // Clear token and user on 401
+                    localStorage.removeItem("token");
+                    delete api.defaults.headers.common["Authorization"];
+                    setUser(null);
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        return () => {
+            api.interceptors.response.eject(responseInterceptor);
+        };
+    }, []);
 
     // Load user from local storage
     useEffect(() => {
@@ -38,9 +58,12 @@ export const AuthProvider = ({ children }) => {
     const login = async (credentials) => {
         try {
             const response = await loginUser(credentials);
-            localStorage.setItem("token", response.data.token);
-            api.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-            setUser(response.data.user);
+            const token = response.data.token;
+            localStorage.setItem("token", token);
+            api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+            // Fetch user profile after setting the token
+            const userResponse = await fetchUserProfile();
+            setUser(userResponse.data);
         } catch (error) {
             console.error("Login failed:", error.response?.data?.error || error);
             throw error;
@@ -50,9 +73,14 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData) => {
         try {
             const response = await registerUser(userData);
-            localStorage.setItem("token", response.data.token);
-            api.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-            setUser(response.data.user);
+            // Check if registration returns a token (some implementations do)
+            if (response.data.token) {
+                localStorage.setItem("token", response.data.token);
+                api.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
+                // Fetch user profile after setting the token
+                const userResponse = await fetchUserProfile();
+                setUser(userResponse.data);
+            }
         } catch (error) {
             console.error("Registration failed:", error.response?.data?.error || error);
             throw error;

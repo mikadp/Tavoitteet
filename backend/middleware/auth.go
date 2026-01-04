@@ -28,7 +28,7 @@ func RequireAuth(c *gin.Context) {
 	}
 
 	// Extract the token
-	splitToken := strings.Split(tokenString, "")
+	splitToken := strings.Split(tokenString, " ")
 	if len(splitToken) != 2 || splitToken[0] != "Bearer" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		c.Abort()
@@ -36,8 +36,8 @@ func RequireAuth(c *gin.Context) {
 	}
 	tokenString = splitToken[1]
 
-	// Parse the token
-	claims := &jwt.StandardClaims{}
+	// Parse the token with custom claims
+	claims := &jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		return jwtSecret, nil
 	})
@@ -50,9 +50,9 @@ func RequireAuth(c *gin.Context) {
 		return
 	}
 
-	// Extract user_id from the token
-	userID := claims.Subject
-	if userID == "" {
+	// Extract user_id from the token claims
+	userID, exists := (*claims)["user_id"]
+	if !exists {
 		log.Println("❌ Token does not contain user ID")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token, no user ID"})
 		c.Abort()
@@ -68,8 +68,9 @@ func RequireAuth(c *gin.Context) {
 		return
 	}
 
-	// Set user_id in the context
+	// Set user_id and role in the context
 	c.Set("user_id", user.ID)
+	c.Set("role", user.Role)
 
 	// Call handler
 	c.Next()

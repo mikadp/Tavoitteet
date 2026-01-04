@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchGoals, createGoal, deleteGoal } from '../api/api';
 
 const Goals = () => {

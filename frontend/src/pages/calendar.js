@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchActiveUserGoals } from '../api/api';
 
 
@@ -6,8 +6,8 @@ const Calendar = () => {
     const [goals, setGoals] = useState({});
     const [completedGoals, setCompletedGoals] = useState({});
     const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() +1, 0).getDate();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [setLoading] = useState(true);
+    const [setError] = useState(null);
         
     useEffect(() =>{
     // Fetch active user goals and completion status from database when component mounts
