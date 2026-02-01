@@ -3,7 +3,7 @@ import { fetchGoals, createGoal, deleteGoal } from '../api/api';
 
 const Goals = () => {
     const [goals, setGoals] = useState([]);
-    const initialGoalState = { goal_name: "", target_date: "", repetition: "daily" };
+    const initialGoalState = { goal_name: "", target_date: "", repetition: "daily", description: "" };
     const [newGoal, setNewGoal] = useState(initialGoalState);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -119,7 +119,8 @@ const Goals = () => {
             const response = await createGoal({
                 goal_name: newGoal.goal_name,
                 target_date: formattedDate,
-                repetition: newGoal.repetition
+                repetition: newGoal.repetition,
+                description: newGoal.description
             });
             
             console.log("🔹 Backendin vastaus:", response.data);
@@ -127,7 +128,7 @@ const Goals = () => {
             // Update the state with the new goal
             if (response?.data) {
                 setGoals((prevGoals) => [...prevGoals, response.data.data]);
-                setNewGoal(initialGoalState); // clear the input field
+                setNewGoal(initialGoalState); // clear the input fields
                 setSuccess('✅Tavoite luotu onnistuneesti'); // Show a success message
             } else {
                 throw new error('Invalid response');
@@ -179,6 +180,13 @@ const Goals = () => {
         }));
     }, []);
 
+    const handleDescriptionChange = useCallback((e) => {
+        setNewGoal((prevGoal) => ({
+            ...prevGoal,
+            description: e.target.value
+        }));
+    }, []);
+
     return (
             <div className="p-4">
                 <h1 className="text-2xl font-bold mb-4">Tavoitteet</h1>
@@ -198,6 +206,7 @@ const Goals = () => {
                                     <th className="border border-gray-300 px-4 py-2 text-left">Nimi</th>
                                     <th className="border border-gray-300 px-4 py-2 text-left">Tavoite päivämäärä</th>
                                     <th className="border border-gray-300 px-4 py-2 text-left">Toistuvuus</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left">Kuvaus</th>
                                     <th className="border border-gray-300 px-4 py-2 text-left">Poista tavoite</th>
                                 </tr>
                             </thead>
@@ -207,6 +216,7 @@ const Goals = () => {
                                 <td className="border border-gray-300 px-4 py-2">{goal.goal_name}</td>
                                 <td className="border border-gray-300 px-4 py-2">{goal.target_date? formatDate(goal.target_date): "Ei päivämäärä"}</td>
                                 <td className="border border-gray-300 px-4 py-2">{formatRepetition(goal.repetition)}</td>
+                                <td className="border border-gray-300 px-4 py-2 max-w-xs truncate">{goal.description || goal.Description || 'Ei kuvausta'}</td>
                                 <td className="border border-gray-300 px-4 py-2">
                                     <button
                                         className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 mr-2"
@@ -244,6 +254,13 @@ const Goals = () => {
                         <option value="weekly">Viikottainen</option>
                         <option value="monthly">Kuukausittainen</option>
                     </select>
+                    <textarea
+                        placeholder="Kuvaus (valinnainen)"
+                        value={newGoal.description}
+                        onChange={handleDescriptionChange}
+                        rows={3}
+                        className="border p-2 mb-2 rounded w-full max-w-md mr-2"
+                    />
                     <button 
                         className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" 
                         onClick={handleCreateGoal}

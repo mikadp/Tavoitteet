@@ -40,9 +40,10 @@ func CreateGoal(c *gin.Context) {
 	}
 
 	var input struct {
-		GoalName   string `json:"goal_name"`
-		TargetDate string `json:"target_date"`
-		Repetition string `json:"repetition"`
+		GoalName    string `json:"goal_name"`
+		TargetDate  string `json:"target_date"`
+		Repetition  string `json:"repetition"`
+		Description string `json:"description"`
 	}
 
 	// Bind JSON -> Input (string)
@@ -90,12 +91,16 @@ func CreateGoal(c *gin.Context) {
 	}
 
 	// Create new goal struct for database
+	desc := input.Description
+	if desc == "" {
+		desc = "Ei kuvausta"
+	}
 	goal := models.Goal{
 		UserID:      uid,
 		GoalName:    input.GoalName,
 		TargetDate:  parsedDate,
 		Repetition:  input.Repetition,
-		Description: "Ei kuvausta",
+		Description: desc,
 	}
 
 	log.Println("Goal data before save:", goal)
