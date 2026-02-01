@@ -24,7 +24,7 @@ export const fetchUserProfile = () => api.get("/me");              // Hakee käy
 export const fetchGoals = () => api.get("/goals/");                // Hakee kaikki tavoitteet
 export const createGoal = (data) => api.post("/goals/", data);     // Luo uuden tavoitteen
 export const deleteGoal = (id) => api.delete(`/goals/${id}`);      // Poistaa tavoitteen
-export const fetchActiveUserGoals = () => api.get("/goals/active"); // Hakee aktiivisen käyttäjän tavoitteet
+export const fetchActiveUserGoals = () => api.get("/goals/"); // Hakee aktiivisen käyttäjän tavoitteet
 
 // User specific goals
 export const getUserGoals = () => api.get("/goals/");

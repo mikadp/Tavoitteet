@@ -5,7 +5,7 @@ const Users = () => {
     const [users, setUsers] = useState([]); // List of users, initially empty
     const [newUserName, setNewUserName] = useState('');
     const [loading, setLoading] = useState(true); // For loading animation
-    const [setError] = useState(''); // For error messages
+    const [error, setError] = useState(''); // For error messages
 
     useEffect(() => {
         console.log("Users state updated:", users); // check the users state
@@ -18,7 +18,7 @@ const Users = () => {
             const response = await fetchUsers();
             console.log('Loaded users from api:', response.data); // Check the response data
             setUsers(Array.isArray(response.data.data) ? response.data.data : []); // Ensure the data is an array
-            console.log('Users:', users); // Check the users state
+            console.log('Users (from response):', response.data.data); // Log the response data for clarity
         } catch (error) {
             setError('Käyttäjien lataaminen epäonnistui'); // Show an error message
             console.error('Error fetching users:', error);
@@ -37,7 +37,7 @@ const Users = () => {
             return;
         }
         try {
-            await createUser({ Username: newUserName }); 
+            await createUser({ username: newUserName }); 
             setNewUserName(''); // clear the input field
             loadUsers(); // fetch the updated list of users
         } catch (error) {
@@ -70,21 +70,25 @@ const Users = () => {
             ) : (
             // Show the list of users
             <ul className="mb-4">
-                {users.map((user) => (
+                {users.map((user) => {
+                    const id = user.ID ?? user.id;
+                    const name = user.Username ?? user.username ?? user.name ?? '';
+                    return (
                         <li
-                            key={user.ID}
+                            key={id}
                             className="border p-2 mb-2 rounded flex justify-between"
                         >
-                            {user.Username}
+                            {name}
                             <button
                                 className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                                onClick={() => handleDeleteUser(user.ID)}
+                                onClick={() => handleDeleteUser(id)}
                             >
                                 Poista käyttäjä
                             </button>
                         </li>
-                    ))}
-                    </ul>
+                    );
+                })}
+            </ul>
             )}
             {/* Create a new user */}
             <div>
