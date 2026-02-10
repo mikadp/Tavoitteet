@@ -40,7 +40,7 @@ function App() {
               {/* Protected Routes */}
               <Route path="/dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />
               <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
-              <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+              <Route path="/users" element={<AdminRoute><Users /></AdminRoute>} />
               <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
             </Routes>
           </div>
