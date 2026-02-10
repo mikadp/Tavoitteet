@@ -44,17 +44,17 @@ Navigate To Homepage And Register New User
     
     Click Link    Rekisteröidy
     Log    Clicked on 'Rekisteröidy' link
-    Wait Until Page Contains Element    css:input[placeholder="Username"]   5s   
+    Wait Until Page Contains Element    css:input[placeholder="Username"]   timeout=5s   
     Input Text  css:input[placeholder="Username"]   ${USERNAME}
 
-    Wait Until Page Contains Element    css:input[placeholder="Password"]   5s
+    Wait Until Page Contains Element    css:input[placeholder="Password"]   timeout=5s
     Input Text    css:input[placeholder="Password"]    ${PASSWORD}
     
     Click Button    css:button#submit_register
-    Wait Until Page Contains     ✅ Registration successful!    timeout=5s
+    Wait Until Page Contains     Registration successful!    timeout=5s
 
     #check redirecting
-    Wait Until Page Contains    ${LOGIN_PAGE_URL}   5s
+    Wait Until Location Is    ${LOGIN_PAGE_URL}   timeout=5s
 
     [Teardown]    Custom Teardown    ${CHROME_DATA_DIR}
     Log    Test case completed
