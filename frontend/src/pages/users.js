@@ -5,7 +5,7 @@ const Users = () => {
     const [users, setUsers] = useState([]); // List of users, initially empty
     const [newUserName, setNewUserName] = useState('');
     const [loading, setLoading] = useState(true); // For loading animation
-    const [error, setError] = useState(''); // For error messages
+    const [setError] = useState(''); // For error messages
 
     useEffect(() => {
         console.log("Users state updated:", users); // check the users state

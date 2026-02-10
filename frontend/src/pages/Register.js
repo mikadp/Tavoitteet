@@ -1,6 +1,6 @@
 //Page for user register
 import {useContext, useState} from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 
 const Register = () => {
@@ -8,7 +8,7 @@ const Register = () => {
     const [userData, setUserData] = useState({ username: "", password: ""});
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState("");
-    const navigate = useNavigate();
+    //const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
