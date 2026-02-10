@@ -90,7 +90,7 @@ const Calendar = () => {
         setGoalsByDay(map);
     }, [goalsArray, year, month, daysInMonth]);
 
-    // Build grid cells (Monday-first) as a flat array
+    // Build grid cells as a flat array
     const cells = useMemo(() => {
         const firstDay = new Date(year, month, 1);
         // convert to Monday-first index
@@ -192,7 +192,9 @@ return (
                         cell.empty ? (
                             <div key={idx} style={{border:'1px solid #e5e7eb', borderRadius:6, height:120, background:'#f8fafc'}}></div>
                         ) : (
-                            <div key={idx} style={{border:'1px solid #e5e7eb', borderRadius:6, padding:8, height:120, display:'flex', flexDirection:'column', overflow:'visible', background:'#fff'}}>
+                            <div key={idx} style={{border:'1px solid #e5e7eb', borderRadius:6, padding:8, height:120, display:'flex', flexDirection:'column', overflow:'visible', background:'#fff', 
+                                //apply green border current date
+                                ...(cell.dayNumber === today.getDate() ? {borderColor:'#10b981', boxShadow:'0 0 8px rgba(16,185,129,0.5)'} : {})}}>
                                 <div style={{fontSize:'0.85rem', fontWeight:600, marginBottom:6}}>{cell.label}</div>
                                 <div style={{fontSize:'0.75rem', color:'#374151', overflowY:'auto'}}>
                                     {cell.dayGoals.length === 0 ? (
