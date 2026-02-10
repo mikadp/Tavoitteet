@@ -12,8 +12,8 @@ const api = axios.create({
 });
 
 // Käyttäjä-API 
-export const registerUser = (data) => api.post("/register", data);
-export const loginUser = (data) => api.post("/login", data);
+export const registerUser = (data) => api.post("/register", data); // Rekisteröi uuden käyttäjän
+export const loginUser = (data) => api.post("/login", data);       // Kirjaa käyttäjän sisään ja palauttaa tokenin
 export const fetchUsers = () => api.get("/users/");                // Hakee kaikki käyttäjät
 export const createUser = (data) => api.post("/users/", data);     // Luo uuden käyttäjän
 export const updateUserStatus = (id) => api.patch(`/users/${id}`); // Päivittää käyttäjän tilan
