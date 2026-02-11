@@ -90,8 +90,8 @@ const Calendar = () => {
         setGoalsByDay(map);
     }, [goalsArray, year, month, daysInMonth]);
 
-    // Build grid cells as a flat array
-    const cells = useMemo(() => {
+    // Build calendar rows (weeks) with cells
+    const weeks = useMemo(() => {
         const firstDay = new Date(year, month, 1);
         // convert to Monday-first index
         const firstWeekdayMonday = (firstDay.getDay() + 6) % 7;
@@ -99,22 +99,109 @@ const Calendar = () => {
         const rows = Math.ceil(totalCells / 7);
         const result = [];
         for (let r = 0; r < rows; r++) {
+            const row = [];
             for (let c = 0; c < 7; c++) {
                 const cellIndex = r * 7 + c; // 0-based index including leading blanks
                 const dayNumber = cellIndex - firstWeekdayMonday + 1;
                 if (dayNumber < 1 || dayNumber > daysInMonth) {
-                    result.push({ empty: true });
+                    row.push({ empty: true });
                 } else {
                     const weekday = weekdayNames[c];
                     const dayStr = String(dayNumber).padStart(2, '0');
                     const label = `${dayStr} ${weekday}`;
                     const dayGoals = goalsByDay[dayNumber] || [];
-                    result.push({ empty: false, dayNumber, label, dayGoals });
+                    row.push({ empty: false, dayNumber, label, dayGoals });
                 }
             }
+            result.push(row);
         }
         return result;
     }, [daysInMonth, goalsByDay, year, month]);
+
+    // Determine weekly goals that should appear as a full-week bar for each week row
+    const weeklyGoalsByRow = useMemo(() => {
+        const rows = [];
+        weeks.forEach((row) => {
+            const matches = goalsArray.filter((g) => {
+                const repetition = (g.repetition ?? g.Repetition ?? '')?.toString().toLowerCase();
+                if (repetition !== 'weekly') return false;
+
+                // determine start and end dates for the goal
+                const startStr = g.created_at ?? g.CreatedAt ?? g.start_date ?? g.startDate ?? g.target_date ?? g.TargetDate ?? null;
+                const endStr = g.target_date ?? g.TargetDate ?? g.TargetDate ?? null;
+                const startDate = startStr ? new Date(startStr) : null;
+                const endDate = endStr ? new Date(endStr) : null;
+                if (startDate && isNaN(startDate)) return false;
+                if (endDate && isNaN(endDate)) return false;
+
+                // the weekly occurrence weekday is taken from the startDate if available
+                const weekday = startDate ? startDate.getDay() : null;
+                if (weekday === null) return false;
+
+                // find if this week's row contains the weekday occurrence
+                const occurrenceCell = row.find((c) => !c.empty && new Date(year, month, c.dayNumber).getDay() === weekday);
+                if (!occurrenceCell) return false;
+
+                const occurrenceDate = new Date(year, month, occurrenceCell.dayNumber);
+                // occurrence must be on/after startDate (if present) and on/before endDate (if present)
+                if (startDate && occurrenceDate < startDate) return false;
+                if (endDate && occurrenceDate > endDate) return false;
+
+                return true;
+            });
+            rows.push(matches);
+        });
+        return rows;
+    }, [weeks, goalsArray, year, month, daysInMonth]);
+
+    // Small component to render a weekly goal pill with hover tooltip
+    const WeeklyGoalItem = ({ g }) => {
+        const [hovered, setHovered] = useState(false);
+        const [rect, setRect] = useState(null);
+        const ref = useRef(null);
+        const desc = g.description ?? g.Description ?? '';
+        const name = g.displayName || g.goal_name || g.GoalName || '';
+
+        useLayoutEffect(() => {
+            if (hovered && ref.current) setRect(ref.current.getBoundingClientRect());
+        }, [hovered]);
+
+        const tooltip = desc && rect && hovered ? (
+            <div style={{
+                position: 'fixed',
+                left: Math.max(8, rect.left),
+                top: rect.top,
+                transform: 'translateY(-110%)',
+                background: '#111827',
+                color: '#fff',
+                padding: '8px',
+                borderRadius: 6,
+                boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
+                zIndex: 9999,
+                width: 300,
+                fontSize: '0.9rem',
+                lineHeight: 1.2,
+                whiteSpace: 'normal'
+            }}>{desc}</div>
+        ) : null;
+
+        return (
+            <>
+                <div
+                    ref={ref}
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
+                    onFocus={() => setHovered(true)}
+                    onBlur={() => setHovered(false)}
+                    tabIndex={0}
+                    style={{background:'#d1d5db', padding:'8px 12px', borderRadius:999, fontSize:'0.95rem', fontWeight:600, color:'#111827', cursor:'pointer'}}
+                >
+                    {name}
+                </div>
+                {tooltip ? createPortal(tooltip, document.body) : null}
+            </>
+        );
+    };
     // Small component to render a goal with hover description
 const GoalItem = ({ g }) => {
     const [hovered, setHovered] = useState(false);
@@ -187,26 +274,37 @@ return (
                     ))}
                 </div>
 
-                <div style={{display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:'12px', marginTop:'8px'}}>
-                    {cells.map((cell, idx) => (
-                        cell.empty ? (
-                            <div key={idx} style={{border:'1px solid #e5e7eb', borderRadius:6, height:120, background:'#f8fafc'}}></div>
-                        ) : (
-                            <div key={idx} style={{border:'1px solid #e5e7eb', borderRadius:6, padding:8, height:120, display:'flex', flexDirection:'column', overflow:'visible', background:'#fff', 
-                                //apply green border current date
-                                ...(cell.dayNumber === today.getDate() ? {borderColor:'#10b981', boxShadow:'0 0 8px rgba(16,185,129,0.5)'} : {})}}>
-                                <div style={{fontSize:'0.85rem', fontWeight:600, marginBottom:6}}>{cell.label}</div>
-                                <div style={{fontSize:'0.75rem', color:'#374151', overflowY:'auto'}}>
-                                    {cell.dayGoals.length === 0 ? (
-                                        <div style={{color:'#9ca3af'}}>Ei tavoitteita</div>
-                                    ) : (
-                                        cell.dayGoals.map((g) => (
-                                            <GoalItem key={g.id ?? g.ID ?? Math.random()} g={g} />
-                                        ))
-                                    )}
+                <div style={{display:'flex', flexDirection:'column', gap:12, marginTop:'8px'}}>
+                    {weeks.map((row, rowIdx) => (
+                        <div key={rowIdx} style={{display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:'12px'}}>
+                            {weeklyGoalsByRow[rowIdx] && weeklyGoalsByRow[rowIdx].length > 0 && (
+                                <div style={{gridColumn: '1 / -1', border:'1px solid #e5e7eb', borderRadius:6, padding:8, background:'#eef2ff', display:'flex', gap:8, alignItems:'center'}}>
+                                    {weeklyGoalsByRow[rowIdx].map((g) => (
+                                        <WeeklyGoalItem key={g.id ?? g.ID ?? Math.random()} g={g} />
+                                    ))}
                                 </div>
-                            </div>
-                        )
+                            )}
+
+                            {row.map((cell, cidx) => (
+                                cell.empty ? (
+                                    <div key={cidx} style={{border:'1px solid #e5e7eb', borderRadius:6, height:120, background:'#f8fafc'}}></div>
+                                ) : (
+                                    <div key={cidx} style={{border:'1px solid #e5e7eb', borderRadius:6, padding:8, height:120, display:'flex', flexDirection:'column', overflow:'visible', background:'#fff',
+                                        ...(cell.dayNumber === today.getDate() ? {borderColor:'#10b981', boxShadow:'0 0 8px rgba(16,185,129,0.5)'} : {})}}>
+                                        <div style={{fontSize:'0.85rem', fontWeight:600, marginBottom:6}}>{cell.label}</div>
+                                        <div style={{fontSize:'0.75rem', color:'#374151', overflowY:'auto'}}>
+                                            {cell.dayGoals.length === 0 ? (
+                                                <div style={{color:'#9ca3af'}}>Ei tavoitteita</div>
+                                            ) : (
+                                                cell.dayGoals.map((g) => (
+                                                    <GoalItem key={g.id ?? g.ID ?? Math.random()} g={g} />
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                )
+                            ))}
+                        </div>
                     ))}
                 </div>
             </div>
